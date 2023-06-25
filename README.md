@@ -1,2 +1,2 @@
-# Reccomendation_Comparison_System
+# Recomendation_Comparison_System
 Recommendation and Comparison various educational Institutes in nepal
