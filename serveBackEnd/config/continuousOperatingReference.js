@@ -1,5 +1,6 @@
 import crossOriginAccess from "./crossOriginAcess.js";
 
+//Access controller
 const continuousOperatingReference = {
     origin: (origin, callback) => {
         if(crossOriginAccess.indexOf(origin) !==-1 || !origin) {

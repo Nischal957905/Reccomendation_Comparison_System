@@ -7,23 +7,29 @@ import { dirname,join } from 'path'
 import root from './routes/main.js'
 import cookieParser from "cookie-parser"
 import error from "./middleware/error.js"
+import routeInstitute from './routes/institute.js'
 import dbConnection from './config/dbConnection.js'
 import { logger, eventLogs } from './middleware/logger.js'
 import core from './config/continuousOperatingReference.js'
 
-
+//Configuration on dot env file for setting up a environment for database.
 dotenv.config();
 
 const app = express()
-app.use(logger)
-app.use(cors(core))
-app.use(express.static('public'))
-app.use('/',root);
+app.use(logger) //function for logging web app log into the logs directories
+app.use(cors(core)) //implementation of cors policy to block or allow access
+app.use(express.static('public')) //declaration of entrypoint directoyr file
+app.use('/',root); //declaration of routes path
+app.use('/institute', routeInstitute);
 app.use(express.json())
 app.use(cookieParser())
 dbConnection()
 
 const PORT = process.env.port || 8800
+
+//Usage of filename and dirname to convert plain js into es6 module.
+//Necessary to define path later on
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -31,6 +37,7 @@ app.get("/", (req,res)=>{
     res.json("Response Given")
 })
 
+//Function for handling requests fo error requests
 app.all('*',(req,res) => {
     res.status(404)
     if(req.accepts('html')){
