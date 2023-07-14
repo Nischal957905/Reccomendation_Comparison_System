@@ -5,7 +5,7 @@ import handleAsync from 'express-async-handler'
 // @route GET/institution
 // @private
 const getInstitutionList = handleAsync(async (req, res) => {
-    const institution = await Institution.find().select().lean().limit(1);
+    const institution = await Institution.find().select().lean();
     if(!institution) {
         return res.status(400).json({message: 'No Institution found'})
     }

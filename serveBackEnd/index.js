@@ -20,7 +20,7 @@ app.use(logger) //function for logging web app log into the logs directories
 app.use(cors(core)) //implementation of cors policy to block or allow access
 app.use(express.static('public')) //declaration of entrypoint directoyr file
 app.use('/',root); //declaration of routes path
-app.use('/institute', routeInstitute);
+app.use('/institution', routeInstitute);
 app.use(express.json())
 app.use(cookieParser())
 dbConnection()
