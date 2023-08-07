@@ -41,10 +41,16 @@
 //     )    
 // }
 
+/*
+These are the imports that are required in the development of the system.
+Various inclusion of imports containing react-icon imoprts as well as differet state imports exist
+*/
 
-import { useGetInstitutionsQuery } from "../../app/api/appSlice"
+import { useGetInstitutionsQuery, useGetInstitutionsOnFilterQuery } from "../../app/api/appSlice"
+import { appSlice } from "../../app/api/appSlice"
 import React, { useEffect, useState } from "react"
 import '../../index.css'
+import Button from '@mui/material/Button'
 import { MdExpandMore } from 'react-icons/Md'
 import { BiSearchAlt,BiSolidSortAlt } from 'react-icons/Bi'
 import { IoMdSettings } from 'react-icons/Io'
@@ -62,18 +68,61 @@ import { PiNumberOneBold as One,
         PiNumberZeroBold as Zero } from 'react-icons/Pi'
 // import Institution from "./Institution"
 
+import Filter from "../../components/filter/Filter"
+import { UseMutation } from "@reduxjs/toolkit/dist/query/react"
+//Function definintion to be exported.
 export default function InstitutionList(){
 
+    //Custom hook of rtk query being used to get the data from the rest api
     const {
-        data: institutions,
+        data: institutionData,
         isLoading,
         isSuccess,
         isError,
         error
     } = useGetInstitutionsQuery()
 
+
+    const { institutions, countries, emails, speciality} = institutionData ? institutionData : []
+   
+    //React use state being setup to store the top ten insitutions in the database
     const [score, setScore] = useState([])
 
+    const val = false;
+    const [filteredData, setFilteredData] = useState([])
+
+    function filterData(filterCondition) {
+        if(Array.isArray(filterCondition)){
+            
+        }
+    }
+
+    const [selectedValue, setSelectedValue] = useState({});
+
+    const updateFilters = (field, values) => {
+        setSelectedValue((prevVal, index) => {
+            return {
+                ...prevVal,
+                [field]: values
+            }
+        })
+    }
+
+    const { 
+        data: dataFiltered, 
+        isLoading: filterLoading, 
+        error: filterError
+    } = useGetInstitutionsOnFilterQuery(selectedValue);
+
+    const { status }  = dataFiltered ? dataFiltered : []
+    const dataFiltration = dataFiltered? dataFiltered.institutions : null
+
+    const submitFilters = async (event) => {
+        event.preventDefault()
+    }
+
+    //this effect calculates the point for the insitution and returns 10 insitutions 
+    //ranked top. It runs only once per initial render.
     useEffect(() => {
 
         if(Array.isArray(institutions) && institutions.length > 0) {
@@ -139,24 +188,43 @@ export default function InstitutionList(){
     },[institutions])
 
  
-    const institutionName = Array.isArray(institutions)
-    ? institutions.map((institution, index) => {
-        const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
-        return (
-            <div key={index} className="child-items">
-                <div key={index} className="img-holder">
-                    <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
-                </div>
-                <div className="name-holder">
-                    {institution.name}
-                    <GrFormNextLink className="link-institution"/>
-                </div>
-            </div>
-        )
-    }) : null
+    //This code consists of codes to return necessary jsx for the each insitituoin
+    //in the database system.
 
+    const institutionName = (Array.isArray(dataFiltration) && status) ? 
+        dataFiltration.map((institution, index) => {
+            const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
+            return (
+                <div key={index} className="child-items">
+                    <div key={index} className="img-holder">
+                        <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
+                    </div>
+                    <div className="name-holder">
+                        {institution.name}
+                        <GrFormNextLink className="link-institution"/>
+                    </div>
+                </div>
+            )
+            }) : Array.isArray(institutions)
+        ? institutions.map((institution, index) => {
+            const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
+            return (
+                <div key={index} className="child-items">
+                    <div key={index} className="img-holder">
+                        <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
+                    </div>
+                    <div className="name-holder">
+                        {institution.name}
+                        <GrFormNextLink className="link-institution"/>
+                    </div>
+                </div>
+            )
+        }) : null
+
+    //this array holds different aliased component to render ranks per the ranks.
     const numberArray = {1: <One/>,2: <Two/>,3: <Three/>,4:<Four/>,5:<Five/>,6:<Six/>,7:<Seven/>,8:<Eight/>,9:<Nine/>};
 
+    //function to determine ranking of the instituion and return the number they have.
     const returnNumber = (number) => {
 
         const numbers = parseInt(number)
@@ -181,6 +249,7 @@ export default function InstitutionList(){
         return content
     }
 
+    //This call back function returns require jsx syntaxes for the rendering purposes.
     const rankingInstitution = score ? score.map((ranking, index) => {
         const imagesDirectory = `/images/${ranking.name.replace(/ /g, "_")}`;
         return (
@@ -197,6 +266,7 @@ export default function InstitutionList(){
         )
     }) : null
 
+    //This vraiable consists of the jsx to be returned and rendered for the search div.
     const searchDiv = (
         <div className="search-holder">
             <div className="search-bar">
@@ -206,6 +276,7 @@ export default function InstitutionList(){
         </div>
     )
 
+    //This is the return statement for the page and actually renders whatever is inside it.
     return (
         <div className="layout">
             <div className="left-div">
@@ -213,26 +284,30 @@ export default function InstitutionList(){
                 <div>
                     <div className="filter-options">
                         <div className="filter-con">
-                            <div className="filter-country">country  <RiArrowDropDownLine className="dropdown"/></div>
-                            <div className="filter-location">location  <RiArrowDropDownLine className="dropdown"/></div>
-                            <div className="filter-university">university  <RiArrowDropDownLine className="dropdown"/></div>
+                            <form onSubmit={submitFilters}>
+                            <div className="filter-country"><Filter fieldName="country" update={updateFilters}  options={countries || []} values={selectedValue.country || [] }/></div>
+                            <div className="filter-location"><Filter fieldName="email" update={updateFilters} options={emails || []} values={selectedValue.email || [] }/></div>
+                            <div className="filter-university"><Filter fieldName="speciality" update={updateFilters} options={speciality || []} values={selectedValue.speciality || [] }/></div>
+                            <button>Apply</button>
+                            </form>
                             <div className="filter-settings">
                                 <p>Filter</p>
                                 <IoMdSettings/>
                             </div>
                         </div>
                     </div>
-                <   div className="result-counter">
+                    <div className="result-counter">
                         <p>Institution Found: {institutions ? institutions.length : 0} </p>
                         <BiSolidSortAlt className="sort-icon"/>
                     </div>
-               <    div className="item-container">
+                    <div className="item-container">s
                         { institutionName }
                     </div>
                     <div></div>
                 </div>
             </div>
             <div className="right-div">
+                
                 <div className="rating-menu">
                     <div className="top-holder">Top Rated</div>
                     <div className="top-rating">Rating</div>
