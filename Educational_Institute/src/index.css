@@ -3,23 +3,27 @@
     margin: 0;
 }
 
+/*This is the css styling for the header of the layout page*/
 .header-user{
     background-color: #2E2929;
     display: grid;
     grid-template-columns: 6fr 3.8fr 2fr 1fr;
 }
 
+/*This is the css styling for the logo of the layout page*/
 .logo-con{
     height: 40px;
     width: 180px;
     padding: 18px 26px;
 }
 
+/*This is the css styling for the image inside teh logo of the layout page*/
 .logo-con > img{
     height: 42px;
     width: 180px;
 }
 
+/*This is the css styling for the signup button of the layout page*/
 .btn-signup{
     height: 34px;
     width: 100px;
@@ -35,10 +39,12 @@
     margin: 18px 26px;
 }
 
+/*This is the css styling for the layout of the listing page*/
 .layout{
     display: flex;
 }
 
+/*This is the css styling for the menu of the listing page*/
 .menu-holder {
     display: flex;
     height: 70px;
@@ -46,21 +52,25 @@
     justify-content: space-around;
 }
 
+/*This is the css styling for the menu container of the listing page*/
 .menu-holder > div{
     font-size: 14px;
     font-weight: 400;
     color: #FFFFFF;
 }
 
+/*This is the css styling for the lists inside menu of the listing page*/
 .list-menu {
     text-decoration: underline;
 }
 
+/*This is the css styling for the search button of the listing page*/
 .search-holder{
     margin-top: 65px;
     padding-left: 60px;
 }
 
+/*This is the css styling for the search bar of the listing page*/
 .search-bar{
     height: 40px;
     display: flex;
@@ -71,17 +81,19 @@
     padding: 0px 15px;
 }
 
+/*This is the css styling for the tect inside search bar of the listing page*/
 .search-bar > p{
     color: #FFFFFF;
     margin-left: auto;
     font-size: 12px;
 }
 
+/*This is the css styling for the search of the listing page*/
 .search-icon{
     color: white;
 }
 
-
+/*This is the css styling for the filters of the listing page*/
 .filter-con{
     display: flex;
     width: 56vw;
@@ -89,12 +101,27 @@
     margin:30px 0px 0px 65px;
 }
 
+/*This is the css styling for the filter of the listing page*/
 .filter-con > div{
     padding: 5px;
     font-size: 14px;
     font-weight: 600;
 }
 
+.filter-con > form{
+    display: flex;
+    padding: 5px;
+    font-size: 14px;
+    font-weight: 600;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.filter-con > form > div{
+    margin-right: 12px;
+} 
+
+/*This is the css styling for the filter setting of the listing page*/
 .filter-settings{
     margin-left: auto;
     display: flex;
@@ -105,6 +132,7 @@
     color: white;
 }
 
+
 .filter-settings > p {
     padding: 0px 5px;
     margin-right: 10px;
@@ -112,27 +140,26 @@
     font-weight: 600;
 }
 
-.dropdown{
-   
-}
-
+/*This is the css styling for the div that holds the number of insitituions of the listing page*/
 .result-counter{
     display: flex;
     width: 56vw;
     margin:30px 0px 0px 65px;
 }
 
-
+/*This is the css styling for the div that holds the text of insitituions of the listing page*/
 .result-counter > p{
     font-size: 14px;
     font-weight: 700;
     padding-left: 5px;
 } 
 
+/*This is the css styling the sorting icon of the listing page*/
 .sort-icon{
     margin-left: auto;
 }
 
+/*This is the css styling for the div that holds insitituions of the listing page*/
 .item-container{
     display: flex;
     flex-wrap: wrap;
@@ -140,6 +167,7 @@
     margin:30px 0px 0px 65px;
 }
 
+/*This is the css styling for insitituions of the listing page*/
 .child-items{
     height: 170px;
     width: 25vw;
@@ -152,6 +180,7 @@
     margin-left: auto;
 }
 
+/*This is the css styling for the div that holds the images of insitituions of the listing page*/
 .img-holder {
     height: 130px;
     width: 25vw;
@@ -162,12 +191,14 @@
     border-right: solid black 1px;
 }
   
+/*This is the css styling for the div that holds the image of insitituions of the listing page*/
 .logo-img{
     width: 100%;
     height: 100%;
     object-fit: fill;
 }
 
+/*This is the css styling for the div that holds the name of insitituions of the listing page*/
 .name-holder{
     height: 40px;
     width: 25vw;
@@ -181,22 +212,27 @@
     justify-content: space-around;
 }
 
+/*This is the css styling for the div that holds the link icon of insitituions of the listing page*/
 .link-institution{
     font-size: 20px;
     background-color: #FFFFFF;
 }
 
+/*This is the css styling reating menu of the listing page*/
 .rating-menu{
     display: flex;
     padding-top: 18vh;
 }
 
+/*This is the css styling for the div that holds the top rated institutions of listing page*/
 .top-holder{
     font-size: 18px;
     font-weight: bold;
     padding:0 2rem;
 }
 
+
+/*This is the css styling for the div that holds the top rated institutions of listing page*/
 .top-rating{
     font-size: 14px;
     font-weight: 500;
@@ -208,6 +244,8 @@
     box-shadow: 1px 1px 3px 1px #675457;
 }
 
+
+/*This is the css styling for the div that holds the top rated institutions based on performance of listing page*/
 .top-performance{
     font-size: 14px;
     font-weight: 500;
@@ -220,6 +258,8 @@
     box-shadow: 1px 1px 3px 1px #675457;
 }
 
+
+/*This is the css styling for the div that holds the top rated institutions based on ranking of listing page*/
 .top-rank{
     font-size: 14px;
     font-weight: 500;
@@ -231,11 +271,14 @@
     box-shadow: 1px 1px 3px 1px #675457;
 }
 
+
+/*This is the css styling for the div that holds the top rated institutions based on rating of listing page*/
 .top-rated{
     padding-left: 32px;
     padding-top: 4rem;
     margin-right: 2vw;
 }
+
 
 .info-top{
     display: flex;
@@ -284,6 +327,45 @@
 
 .ranked-names{
     font-size: 14px;
+}
+
+
+
+.filter-select-fix{
+    display: flex;
+}
+
+.filter-check .MuiSvgIcon-root{
+    font-size: 14px;
+}
+
+.filter-list{
+    font-size: 8px;
+}
+
+.make-it{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+
+.filter-item-strap{
+    display: flex;
+    align-items: center;
+}
+
+.MuiInputLabel-root {
+    font-size: 14px !important;
+}
+
+
+.menu-showcase{
+    position: relative;
+}
+.menu-options{
+    position: absolute;
+}
+
+.filter-showcase{
 }
 
 
