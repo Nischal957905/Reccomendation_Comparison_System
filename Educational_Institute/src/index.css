@@ -121,6 +121,14 @@
     margin-right: 12px;
 } 
 
+.filter-showcase{
+    
+}
+
+.filter-country > div{
+
+}
+
 /*This is the css styling for the filter setting of the listing page*/
 .filter-settings{
     margin-left: auto;
@@ -363,9 +371,63 @@
 }
 .menu-options{
     position: absolute;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    background-color: #675457;
+    padding: 10px;
 }
 
-.filter-showcase{
+
+
+
+
+
+/*
+Css for the Pop up menus.
+*/
+
+.main-pop-con{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
 }
+
+.pop-menu-items{
+    display: flex;
+    width: max-content;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.pop-menu-items > div {
+    margin-top: 10px;
+}
+
+.pop-menu-items > div > label {
+    margin-right: 10px;
+}
+
+.pop-menu-days-options{
+    height: 20px;
+    font-size: 10px;
+}
+
+.pop-menu-div{
+    width: max-content;
+    padding: 20px;
+}
+
+.pop-menu-div > button {
+    margin-right: 20px;
+}
+
+
+
+
+
+
+
 
 

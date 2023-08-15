@@ -12,7 +12,6 @@ export default function Filter(props){
         options,
     } = props
 
-    console.log(options)
     const [selectedValue, setSelectedValue] = useState([]);
     const [menuOpen, setMenuOpen] = useState(false)
     const menuRef = useRef();
@@ -47,32 +46,26 @@ export default function Filter(props){
     }
 
     return (
-        <>
-            <div>
-                <div>
-                    <div className="filter-showcase" ref={menuRef}>
-                        <div className="menu-showcase"><button onClick={showMenuOptions}>{fieldName}<RiArrowDropDownLine/></button></div>
+        <div className="filter-showcase" ref={menuRef}>
+            <div className="menu-showcase"><button onClick={showMenuOptions}>{fieldName}<RiArrowDropDownLine/></button></div>
+            {
+                menuOpen &&
+                    <div className="menu-options">
                         {
-                            menuOpen &&
-                            <div className="menu-options">
-                                {
-                                    options.map((option,index) => (
-                                        <label key={index}>
-                                            <input 
-                                                key={index} 
-                                                type="checkbox" 
-                                                value={option}
-                                                onChange={handleCheckboxChange}
-                                                checked={values.includes(option)}/>
-                                            {option}
-                                        </label>
-                                    ))
-                                }
-                            </div>
+                            options.map((option,index) => (
+                                <label key={index}>
+                                    <input 
+                                        key={index} 
+                                        type="checkbox" 
+                                        value={option}
+                                        onChange={handleCheckboxChange}
+                                        checked={values.includes(option)}/>
+                                    {option}
+                                </label>
+                            ))
                         }
                     </div>
-                </div>
-            </div>
-        </>
+            }
+        </div>
     )
 }

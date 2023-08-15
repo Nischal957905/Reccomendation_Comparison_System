@@ -28,7 +28,7 @@ const institutionalSchema = new mongoose.Schema({
     type: String,
   },
   holidays: [{
-    tyep: String,
+    type: String,
   }],
   universities: {
     type: Number,
@@ -45,7 +45,7 @@ const institutionalSchema = new mongoose.Schema({
   specialization: [{
     type: String,
   }],
-  onine: {
+  online: {
     type: Boolean,
     default: false,
   },
