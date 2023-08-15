@@ -1,52 +1,9 @@
-// import { useGetInstitutionsQuery } from "../../features/institution/restInstitutionApi"
-// import Institution from "./Institution"
-// import { useSelector } from 'react-redux';
-// import { selectInstitutionsResult } from "../../features/institution/restInstitutionApi"
-
-// export default function InstitutionList(){
-
-//     const institutionsResult = useSelector(selectInstitutionsResult);
-
-//   console.log('Institutions Result:', institutionsResult);
-
-//     const {
-//         data: institutions,
-//         isLoading,
-//         isSuccess,
-//         isError,
-//         error
-//     } = useGetInstitutionsQuery()
-
-//     let content
-//     if(isError) {
-//         content = <p className={isError ? "errmsg" : "offscreen"}>{error ?.data?.message}</p>
-//     }
-
-//     const { ids } = institutions
-//     const tableContent = ids?.length
-//         ? ids.map(institutionId => <Institution key={institutionId} userId={userId} />)
-//         : null
-
-//     content = (
-//         <table >
-//             <thead>
-//                 <tr>
-//                     <th>Name</th>
-//                 </tr>
-//             </thead>
-//             <tbody>
-//                 {tableContent}
-//             </tbody>
-//         </table>
-//     )    
-// }
-
 /*
 These are the imports that are required in the development of the system.
 Various inclusion of imports containing react-icon imoprts as well as differet state imports exist
 */
 
-import { useGetInstitutionsQuery, useGetInstitutionsOnFilterQuery } from "../../app/api/appSlice"
+import { useGetInstitutionsQuery, useGetInstitutionsOnFilterQuery, useGetInstitutionsOnAdditionalFilterQuery } from "../../app/api/appSlice"
 import { appSlice } from "../../app/api/appSlice"
 import React, { useEffect, useState } from "react"
 import '../../index.css'
@@ -69,6 +26,7 @@ import { PiNumberOneBold as One,
 // import Institution from "./Institution"
 
 import Filter from "../../components/filter/Filter"
+import PopUp from "../../components/utilities/PopUp"
 import { UseMutation } from "@reduxjs/toolkit/dist/query/react"
 //Function definintion to be exported.
 export default function InstitutionList(){
@@ -83,8 +41,8 @@ export default function InstitutionList(){
     } = useGetInstitutionsQuery()
 
 
-    const { institutions, countries, emails, speciality} = institutionData ? institutionData : []
-   
+    const { institutions, countries, speciality} = institutionData ? institutionData : []
+
     //React use state being setup to store the top ten insitutions in the database
     const [score, setScore] = useState([])
 
@@ -97,7 +55,7 @@ export default function InstitutionList(){
         }
     }
 
-    const [selectedValue, setSelectedValue] = useState({});
+    const [selectedValue, setSelectedValue] = useState([]);
 
     const updateFilters = (field, values) => {
         setSelectedValue((prevVal, index) => {
@@ -117,9 +75,50 @@ export default function InstitutionList(){
     const { status }  = dataFiltered ? dataFiltered : []
     const dataFiltration = dataFiltered? dataFiltered.institutions : null
 
+
+
     const submitFilters = async (event) => {
         event.preventDefault()
     }
+
+    const submitAdditionalFilters = async (event) => {
+        event.preventDefault()
+    }
+
+    const [popUpFilterApplicants, setPopUpFilterApplicants] = useState({
+        'opening-time' : '00:00:00',
+        'closing-time' : '00:00:00',
+        'online-service' : 'offline',
+        'opening-days' : ['none'],
+        'university-start': 0,
+        'university-end': 0,
+        'success-start': 0,
+        'success-end': 0,
+        'experience-start': 0,
+        'experience-end': 0,
+        'platform' : 'Local'
+    })
+
+    const updatePopUpFilterApplicants = (field, values) => {
+        setPopUpFilterApplicants((prevVal, index) => {
+            return {
+                ...prevVal,
+                [field]: values
+            }
+        })
+    }
+
+    const [delayedValue, setDelayedValue] = useState();
+    const delayApplier = () => {
+        setPopMenuOpen(false)
+        setDelayedValue(popUpFilterApplicants)
+    }
+
+    const { 
+        data: dataAdditionalFiltered, 
+        isLoading: filterAdditionalLoading, 
+        error: filterAdditionalError
+    } = useGetInstitutionsOnAdditionalFilterQuery(delayedValue);
 
     //this effect calculates the point for the insitution and returns 10 insitutions 
     //ranked top. It runs only once per initial render.
@@ -187,7 +186,37 @@ export default function InstitutionList(){
         }
     },[institutions])
 
- 
+
+    //Button handle for pop-up section
+    const [popMenuOpen, setPopMenuOpen] = useState(false)
+    
+    const popMenuOpenHandler = () => {
+        setPopMenuOpen(true)
+    }
+
+    const popMenuCloseHandler = () => {
+        setPopMenuOpen(false)
+    }
+
+    const popMenuClearHandler = () => {
+        const value = {
+            'opening-time' : '00:00:00',
+            'closing-time' : '00:00:00',
+            'online-service' : 'offline',
+            'opening-days' : ['none'],
+            'university-start': 0,
+            'university-end': 0,
+            'success-start': 0,
+            'success-end': 0,
+            'experience-start': 0,
+            'experience-end': 0,
+            'platform' : 'Local'
+        }
+        setPopUpFilterApplicants(value)
+    }
+
+
+
     //This code consists of codes to return necessary jsx for the each insitituoin
     //in the database system.
 
@@ -205,7 +234,21 @@ export default function InstitutionList(){
                     </div>
                 </div>
             )
-            }) : Array.isArray(institutions)
+            }) : (dataAdditionalFiltered && dataAdditionalFiltered.additionalStatus) 
+        ? dataAdditionalFiltered.institutions.map((institution, index) => {
+            const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
+            return (
+                <div key={index} className="child-items">
+                    <div key={index} className="img-holder">
+                        <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
+                    </div>
+                    <div className="name-holder">
+                        {institution.name}
+                        <GrFormNextLink className="link-institution"/>
+                    </div>
+                </div>
+            )
+        }) : Array.isArray(institutions)
         ? institutions.map((institution, index) => {
             const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
             return (
@@ -220,6 +263,8 @@ export default function InstitutionList(){
                 </div>
             )
         }) : null
+
+        
 
     //this array holds different aliased component to render ranks per the ranks.
     const numberArray = {1: <One/>,2: <Two/>,3: <Three/>,4:<Four/>,5:<Five/>,6:<Six/>,7:<Seven/>,8:<Eight/>,9:<Nine/>};
@@ -286,11 +331,11 @@ export default function InstitutionList(){
                         <div className="filter-con">
                             <form onSubmit={submitFilters}>
                             <div className="filter-country"><Filter fieldName="country" update={updateFilters}  options={countries || []} values={selectedValue.country || [] }/></div>
-                            <div className="filter-location"><Filter fieldName="email" update={updateFilters} options={emails || []} values={selectedValue.email || [] }/></div>
+                            <div className="filter-location"><Filter fieldName="email" update={updateFilters} options={[]} values={selectedValue.email || [] }/></div>
                             <div className="filter-university"><Filter fieldName="speciality" update={updateFilters} options={speciality || []} values={selectedValue.speciality || [] }/></div>
                             <button>Apply</button>
                             </form>
-                            <div className="filter-settings">
+                            <div className="filter-settings" onClick={popMenuOpenHandler}>
                                 <p>Filter</p>
                                 <IoMdSettings/>
                             </div>
@@ -300,11 +345,24 @@ export default function InstitutionList(){
                         <p>Institution Found: {institutions ? institutions.length : 0} </p>
                         <BiSolidSortAlt className="sort-icon"/>
                     </div>
-                    <div className="item-container">s
+                    <div className="item-container">
                         { institutionName }
                     </div>
                     <div></div>
                 </div>
+            </div>
+            <div>
+                <form onSubmit={submitAdditionalFilters}>
+                    <PopUp 
+                        openStatus ={popMenuOpen} 
+                        popUpMenuOpenHandle={popMenuOpenHandler} 
+                        popUpMenuCloseHandle ={popMenuCloseHandler}
+                        popUpMenuOptions = {popUpFilterApplicants}
+                        setPopUpMenuOptions = {updatePopUpFilterApplicants}
+                        applyDelay = {delayApplier}
+                        applyClear = {popMenuClearHandler}
+                    />
+                </form>
             </div>
             <div className="right-div">
                 

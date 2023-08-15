@@ -24,10 +24,17 @@ export const appSlice = createApi({
               params: filters,
             }),
         }),
+        getInstitutionsOnAdditionalFilter: builder.query({
+            query: (filters) => ({
+                url: '/institution',
+                method: "GET",
+                params: filters,
+            }),
+        }),
     })
 })
 
 //Exporting custom hook to be used in the frontend to gain data.
 export const {
-    useGetInstitutionsQuery, useGetInstitutionsOnFilterQuery
+    useGetInstitutionsQuery, useGetInstitutionsOnFilterQuery, useGetInstitutionsOnAdditionalFilterQuery,
 } = appSlice
