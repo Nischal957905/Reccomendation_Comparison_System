@@ -53,6 +53,12 @@ const institutionalSchema = new mongoose.Schema({
     type: String,
     default: 'Local',
   },
+  latitude: {
+    type: Number,
+  },
+  longitude: {
+    type: Number,
+  }
 });
 
 const Institution = mongoose.model('Institution', institutionalSchema);

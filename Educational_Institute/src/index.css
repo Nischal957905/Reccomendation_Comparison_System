@@ -424,6 +424,13 @@ Css for the Pop up menus.
 }
 
 
+/*Comparable item*/
+.comparable-item-box{
+    display: flex;
+    flex-direction: row;
+}
+
+
 
 
 
