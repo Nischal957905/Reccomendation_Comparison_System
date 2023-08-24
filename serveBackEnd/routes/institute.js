@@ -12,5 +12,8 @@ modemRoute.route('/')
     .patch(institutionController.updateInstitution)
     .delete(institutionController.deleteInstitution)
 
+modemRoute.route('/:institution')
+    .get(institutionController.getSingleInstitution)
+    .post(institutionController.createReviewRating)
     //exporting the router instance to utilize in the main app
 export default modemRoute;

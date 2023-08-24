@@ -8,6 +8,10 @@ import root from './routes/main.js'
 import cookieParser from "cookie-parser"
 import error from "./middleware/error.js"
 import routeInstitute from './routes/institute.js'
+import routeComparison from "./routes/comparison.js"
+import routeCollege from "./routes/college.js"
+import routeAuth from "./routes/auth.js"
+import routeDiscussion from "./routes/discussion.js"
 import dbConnection from './config/dbConnection.js'
 import { logger, eventLogs } from './middleware/logger.js'
 import core from './config/continuousOperatingReference.js'
@@ -20,7 +24,11 @@ app.use(logger) //function for logging web app log into the logs directories
 app.use(cors(core)) //implementation of cors policy to block or allow access
 app.use(express.static('public')) //declaration of entrypoint directoyr file
 app.use('/',root); //declaration of routes path
+app.use('/auth', routeAuth)
 app.use('/institution', routeInstitute);
+app.use('/discussion', routeDiscussion);
+app.use('/comparison', routeComparison);
+app.use('/college',routeCollege);
 app.use(express.json())
 app.use(cookieParser())
 dbConnection()
