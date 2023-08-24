@@ -18,7 +18,6 @@ export default function PopUp(props) {
     const setUpdatedValues = (event) => {
         const {value,name} = event.target;
         setPopUpMenuOptions(name, value)
-
     }
 
     return (
@@ -90,6 +89,19 @@ export default function PopUp(props) {
                         >
                             <option value="Global">Global</option>
                             <option value="Local">Local</option>
+                        </select>
+                    </div>
+                    <div className="pop-menu-distance">
+                        <label>Distance:</label>
+                        <select 
+                            name="distance"
+                            className="pop-menu-distance"
+                            onChange={setUpdatedValues}
+                            value={popUpMenuOptions['distance']}
+                        >
+                            <option value="Near">Near</option>
+                            <option value="Moderate">Moderate</option>
+                            <option value="Distant">Distant</option>
                         </select>
                     </div>
                     <div className="pop-menu-range-success">

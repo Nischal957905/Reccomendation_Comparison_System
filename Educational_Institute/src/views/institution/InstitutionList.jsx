@@ -2,10 +2,12 @@
 These are the imports that are required in the development of the system.
 Various inclusion of imports containing react-icon imoprts as well as differet state imports exist
 */
+import Paginate from "../../components/pagination/Paginate";
 
 import { useGetInstitutionsQuery, useGetInstitutionsOnFilterQuery, useGetInstitutionsOnAdditionalFilterQuery } from "../../app/api/appSlice"
 import { appSlice } from "../../app/api/appSlice"
 import React, { useEffect, useState } from "react"
+import { useParams } from 'react-router-dom';
 import '../../index.css'
 import Button from '@mui/material/Button'
 import { MdExpandMore } from 'react-icons/Md'
@@ -28,34 +30,47 @@ import { PiNumberOneBold as One,
 import Filter from "../../components/filter/Filter"
 import PopUp from "../../components/utilities/PopUp"
 import { UseMutation } from "@reduxjs/toolkit/dist/query/react"
+import { Link } from 'react-router-dom'
 //Function definintion to be exported.
 export default function InstitutionList(){
 
     //Custom hook of rtk query being used to get the data from the rest api
+    const [selectedValue, setSelectedValue] = useState({});
+
     const {
         data: institutionData,
         isLoading,
         isSuccess,
         isError,
         error
-    } = useGetInstitutionsQuery()
-
-
+    } = useGetInstitutionsQuery(selectedValue)
+ 
+    //mark
     const { institutions, countries, speciality} = institutionData ? institutionData : []
 
     //React use state being setup to store the top ten insitutions in the database
     const [score, setScore] = useState([])
 
-    const val = false;
-    const [filteredData, setFilteredData] = useState([])
+    const itemsPerPage = 10;
+    const [currentPage, setCurrentPage] = useState(1);
 
-    function filterData(filterCondition) {
-        if(Array.isArray(filterCondition)){
-            
+    useEffect(() => {
+        setCurrentPage(1)
+    },[institutionData])
+
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    let displayedData = institutions && institutions.slice(startIndex, endIndex);
+    let totalPages = Math.ceil(institutions && institutions.length / itemsPerPage);
+
+    const handlePageChange = (event, newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setCurrentPage(newPage);
         }
-    }
+    };
 
-    const [selectedValue, setSelectedValue] = useState([]);
+    //Button handle for pop-up section
+    const [popMenuOpen, setPopMenuOpen] = useState(false)
 
     const updateFilters = (field, values) => {
         setSelectedValue((prevVal, index) => {
@@ -65,17 +80,6 @@ export default function InstitutionList(){
             }
         })
     }
-
-    const { 
-        data: dataFiltered, 
-        isLoading: filterLoading, 
-        error: filterError
-    } = useGetInstitutionsOnFilterQuery(selectedValue);
-
-    const { status }  = dataFiltered ? dataFiltered : []
-    const dataFiltration = dataFiltered? dataFiltered.institutions : null
-
-
 
     const submitFilters = async (event) => {
         event.preventDefault()
@@ -96,7 +100,8 @@ export default function InstitutionList(){
         'success-end': 0,
         'experience-start': 0,
         'experience-end': 0,
-        'platform' : 'Local'
+        'platform' : 'Local',
+        'distance': 'Near',
     })
 
     const updatePopUpFilterApplicants = (field, values) => {
@@ -108,17 +113,15 @@ export default function InstitutionList(){
         })
     }
 
-    const [delayedValue, setDelayedValue] = useState();
     const delayApplier = () => {
         setPopMenuOpen(false)
-        setDelayedValue(popUpFilterApplicants)
+        setSelectedValue((prevVal) => {
+            return {
+                ...prevVal,
+                ...popUpFilterApplicants
+            }
+        })
     }
-
-    const { 
-        data: dataAdditionalFiltered, 
-        isLoading: filterAdditionalLoading, 
-        error: filterAdditionalError
-    } = useGetInstitutionsOnAdditionalFilterQuery(delayedValue);
 
     //this effect calculates the point for the insitution and returns 10 insitutions 
     //ranked top. It runs only once per initial render.
@@ -185,10 +188,6 @@ export default function InstitutionList(){
             setScore(leadingInstitutions)
         }
     },[institutions])
-
-
-    //Button handle for pop-up section
-    const [popMenuOpen, setPopMenuOpen] = useState(false)
     
     const popMenuOpenHandler = () => {
         setPopMenuOpen(true)
@@ -213,15 +212,14 @@ export default function InstitutionList(){
             'platform' : 'Local'
         }
         setPopUpFilterApplicants(value)
+        setSelectedValue({})
     }
-
-
 
     //This code consists of codes to return necessary jsx for the each insitituoin
     //in the database system.
 
-    const institutionName = (Array.isArray(dataFiltration) && status) ? 
-        dataFiltration.map((institution, index) => {
+    const institutionName =  Array.isArray(institutions)
+        ? displayedData.map((institution, index) => {
             const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
             return (
                 <div key={index} className="child-items">
@@ -230,35 +228,9 @@ export default function InstitutionList(){
                     </div>
                     <div className="name-holder">
                         {institution.name}
-                        <GrFormNextLink className="link-institution"/>
-                    </div>
-                </div>
-            )
-            }) : (dataAdditionalFiltered && dataAdditionalFiltered.additionalStatus) 
-        ? dataAdditionalFiltered.institutions.map((institution, index) => {
-            const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
-            return (
-                <div key={index} className="child-items">
-                    <div key={index} className="img-holder">
-                        <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
-                    </div>
-                    <div className="name-holder">
-                        {institution.name}
-                        <GrFormNextLink className="link-institution"/>
-                    </div>
-                </div>
-            )
-        }) : Array.isArray(institutions)
-        ? institutions.map((institution, index) => {
-            const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
-            return (
-                <div key={index} className="child-items">
-                    <div key={index} className="img-holder">
-                        <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
-                    </div>
-                    <div className="name-holder">
-                        {institution.name}
-                        <GrFormNextLink className="link-institution"/>
+                        <Link to={`/institution/${institution.name}`}>
+                            <GrFormNextLink className="link-institution"/>
+                        </Link>
                     </div>
                 </div>
             )
@@ -331,7 +303,7 @@ export default function InstitutionList(){
                         <div className="filter-con">
                             <form onSubmit={submitFilters}>
                             <div className="filter-country"><Filter fieldName="country" update={updateFilters}  options={countries || []} values={selectedValue.country || [] }/></div>
-                            <div className="filter-location"><Filter fieldName="email" update={updateFilters} options={[]} values={selectedValue.email || [] }/></div>
+                            <div className="filter-location"><Filter fieldName="experience" update={updateFilters} options={['High','Low','Moderate']} values={selectedValue.experience || [] }/></div>
                             <div className="filter-university"><Filter fieldName="speciality" update={updateFilters} options={speciality || []} values={selectedValue.speciality || [] }/></div>
                             <button>Apply</button>
                             </form>
@@ -375,6 +347,12 @@ export default function InstitutionList(){
                 <div className="top-rated">
                     { rankingInstitution}
                 </div>
+                
+                <Paginate
+                    count = {totalPages}
+                    update = {handlePageChange}
+                    pageCurrently={currentPage}
+                />
             </div>
         </div>
     )
