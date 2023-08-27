@@ -1,5 +1,6 @@
 import Institution from '../models/Institution.js'
 import College from '../models/College.js'
+import School from '../models/School.js'
 import Review from '../models/Review.js'
 import handleAsync from 'express-async-handler'
 import * as turf from '@turf/turf'
@@ -143,6 +144,7 @@ const reviewPointHandler = (reviews) => {
 const getComparisonList = handleAsync(async (req, res) => {
 
     const insObject = req.query
+    console.log(insObject)
     let fullObject = [];
     let scoreObject = [];
     let fullReviews = [];
@@ -326,5 +328,80 @@ const getCollegeComparisonList = handleAsync(async (req, res) => {
     return res.json({institutions, institutionsName})
 })
 
+const getSchoolComparisonList = handleAsync(async (req, res) => {
 
-export default {getComparisonList, getCompany, getComparison, getCollegeComparisonList};
+    const insObject = req.query
+    let fullObject = [];
+    let scoreObject = [];
+
+    //Experience Oriented
+    let totalExpPoint = 0;
+
+    if(Object.keys(insObject).length !== 0){
+        for(let iterator in insObject){
+            if(insObject.hasOwnProperty(iterator)){
+                const comparisonInstitution = await School.find(
+                    {name: insObject[iterator]}).select().lean()
+                fullObject.push(comparisonInstitution[0])
+            }
+        }
+    }  
+    
+    if(fullObject.length > 0){
+        fullObject.forEach(item => {
+            if(item.experience === ""){
+                totalExpPoint = totalExpPoint + 0;
+            }
+            else if(item.experience !== ""){
+                totalExpPoint += item.experience;
+            }
+        });
+    }
+    
+    if(fullObject.length > 0){
+        fullObject.forEach((item,index) => {
+            
+            const expPoint = experienceCollegePointHandler(
+                totalExpPoint,
+                item.experience,
+                fullObject.length,
+                item.ugc,
+            )
+
+            const accessPoint = accessPointHandler(
+                item.opening_time,
+                item.closing_time,
+                item.ownership,
+                "jirok"
+            )
+
+            const userLat = 27.6948534;
+            const userLong = 85.3049344;
+            const distance = applyDistanceFilter(
+                userLat,
+                userLong,
+                item.latitude,
+                item.longitude,
+            )
+
+            scoreObject.push({
+                index: index + 1,
+                experience: expPoint,
+                access: accessPoint,
+                institution: item,
+                distanceMetre: distance
+            })
+        });
+    }
+
+    const institutions = await School.find().select().lean();
+    const institutionsName = await School.distinct('name').lean();
+
+    if(fullObject.length > 0){
+        return res.json({institutions, institutionsName,scoreObject})
+    }
+    return res.json({institutions, institutionsName})
+})
+
+
+export default {getComparisonList, getCompany, getComparison, getCollegeComparisonList, getSchoolComparisonList};

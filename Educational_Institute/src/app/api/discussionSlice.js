@@ -6,9 +6,10 @@ export const discussionSlice = createApi({
     tagTypes: ['Discussion'],
     endpoints: (builder) => ({
         getDiscussions: builder.query({
-            query: () => ({
+            query: (filter) => ({
               url: '/discussion',
               method: "GET",
+              params: filter,
             })
         }),
         postDiscussions: builder.query({

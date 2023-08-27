@@ -12,9 +12,31 @@ import Comment from '../../models/Comment.js'
 
 const getPostList = handleAsync(async (req, res) => {
 
-    const postListing = await Post.find().select().lean()
+    const tag = req.query.tag
+    const dateSort = req.query.dateSort
+
+    let postListing;
+    if(tag === "None" || tag === ""){
+        if(dateSort === "Latest"){
+            postListing = await Post.find().select().sort({date: -1}).lean()
+        }
+        else if(dateSort === "Oldest"){
+            postListing = await Post.find().select().sort({date: 1}).lean()
+        }
+    }
+    else{
+        if(dateSort === "Latest"){
+            postListing = await Post.find({tag: tag}).select().sort({date: -1}).lean()
+        }
+        else if(dateSort === "Oldest"){
+            postListing = await Post.find({tag: tag}).select().lean()
+        }
+    } 
+
+
     const commentListing = await Comment.find().select().lean()  
     const userListing = await User.find().select().lean()
+    const uniqueTags = await Post.distinct('tag').select().lean();
 
     let userPosts = [];
     
@@ -45,7 +67,15 @@ const getPostList = handleAsync(async (req, res) => {
         })
     }
 
-    return res.json({structuredData})
+    const dataPopular = req.query.popular;
+    if(dataPopular === "Unpopular"){
+        structuredData.sort((a, b) => a.comments.length - b.comments.length);
+    }
+    else if(dataPopular === "Popular"){
+        structuredData.sort((a, b) => b.comments.length - a.comments.length);
+    }
+
+    return res.json({structuredData, uniqueTags})
 })
 
 // @desc create new Post
@@ -54,10 +84,21 @@ const getPostList = handleAsync(async (req, res) => {
 const createPost = handleAsync(async (req, res) => {
 
     const params = req.query;
-    
-    const user = await User.findOne({username: "Kirito"}).select('_id').lean()
-    const post = await Post.create({'post': params.post, 'user_id': user, 'tag': params.tag})
-    console.log(post)
+
+    if(params.commentStatus){
+        const comment = await Comment.create({
+            comment: params.comment,
+            username: params.username,
+            post_id: params.institution
+        }) 
+        res.status(200).json("Post created")
+    }
+
+    if(params.posting){
+        const user = await User.findOne({username: "Kirito"}).select('_id').lean()
+        const post = await Post.create({'post': params.post, 'user_id': user, 'tag': params.tag})
+        res.status(200).json("Post created")
+    }
 })
 
 // @desc update Post

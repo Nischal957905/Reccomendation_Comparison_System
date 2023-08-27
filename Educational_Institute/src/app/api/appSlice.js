@@ -22,6 +22,13 @@ export const appSlice = createApi({
                 params: filters,
             }),
         }),
+        getSchools: builder.query({
+            query: (filters) => ({
+                url: "/school",
+                method: "GET",
+                params: filters,
+            }),
+        }),
         getInstitutionsOnFilter: builder.query({
             query: (filters) => ({
               url: "/institution",
@@ -56,6 +63,9 @@ export const appSlice = createApi({
         getSingleCollege: builder.query({
             query: (college) => `/college/${college}`,
         }),
+        getSingleSchool: builder.query({
+            query: (school) => `/school/${school}`,
+        }),
         postReview: builder.query({
             query: ({institution,delayedData}) => ({
                 url: `/institution/${institution}`,
@@ -77,4 +87,6 @@ export const {
     useGetCollegesOnFilterQuery,
     useGetCollegesOnAdditionalFilterQuery,
     usePostReviewQuery,
+    useGetSchoolsQuery,
+    useGetSingleSchoolQuery,
 } = appSlice
