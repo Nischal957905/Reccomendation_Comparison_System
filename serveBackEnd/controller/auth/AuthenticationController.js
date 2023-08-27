@@ -35,4 +35,8 @@ const verifyUser = handleAsync(async (req,res) => {
     }
 })
 
-export default { verifyUser };
+const createUser = handleAsync(async (req,res) => {
+    console.log("hit")
+})
+
+export default { verifyUser, createUser };

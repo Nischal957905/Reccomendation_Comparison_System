@@ -143,6 +143,19 @@ export default function PopUp(props) {
                             name="university-end" 
                             onChange={setUpdatedValues}/>
                     </div>
+                    <div className="rating-pop-up-menu">
+                        <label>Rating:</label>
+                        <select 
+                            name="rating"
+                            className="pop-menu-rating"
+                            onChange={setUpdatedValues}
+                            value={popUpMenuOptions['rating']}
+                        >
+                            <option value="Near">High</option>
+                            <option value="Moderate">Low</option>
+                            <option value="Distant">Medium</option>
+                        </select>
+                    </div>
                 </div>
                 <div className="pop-menu-div">
                         <button onClick={popUpMenuCloseHandle} className="close-pop-menu">

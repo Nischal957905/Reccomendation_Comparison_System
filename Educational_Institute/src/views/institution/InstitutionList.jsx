@@ -31,6 +31,8 @@ import Filter from "../../components/filter/Filter"
 import PopUp from "../../components/utilities/PopUp"
 import { UseMutation } from "@reduxjs/toolkit/dist/query/react"
 import { Link } from 'react-router-dom'
+
+import Search from "../../components/utilities/Search";
 //Function definintion to be exported.
 export default function InstitutionList(){
 
@@ -48,6 +50,17 @@ export default function InstitutionList(){
     //mark
     const { institutions, countries, speciality} = institutionData ? institutionData : []
 
+    let instituionsSorted = isSuccess ? institutions : []
+    let awaitData = [...instituionsSorted]
+
+    const [asecSort, setAsecSort] = useState(true)
+
+    const handleSorting = () => {
+        setAsecSort(prevVal => !prevVal)
+    }   
+    
+    const eachInstitutionName = isSuccess && institutions.map(item => item.name)
+
     //React use state being setup to store the top ten insitutions in the database
     const [score, setScore] = useState([])
 
@@ -62,6 +75,29 @@ export default function InstitutionList(){
     const endIndex = startIndex + itemsPerPage;
     let displayedData = institutions && institutions.slice(startIndex, endIndex);
     let totalPages = Math.ceil(institutions && institutions.length / itemsPerPage);
+
+    const [values, setValues] = useState()
+    
+    useEffect(() => {
+        if(asecSort === false && isSuccess){
+            setValues("Is Loading")
+            awaitData.sort((item1,item2) => {
+                let firstSorter = item1.name
+                let secondSorter = item2.name
+                if(firstSorter > secondSorter){
+                    return -1
+                }
+                else if(secondSorter > firstSorter){
+                    return 1
+                }
+                else{
+                    return 0
+                }
+            })
+            displayedData = institutions && awaitData.slice(startIndex, endIndex);
+            setValues("Finished Loading")
+        }
+    },[asecSort])
 
     const handlePageChange = (event, newPage) => {
         if (newPage >= 1 && newPage <= totalPages) {
@@ -102,6 +138,7 @@ export default function InstitutionList(){
         'experience-end': 0,
         'platform' : 'Local',
         'distance': 'Near',
+        'rating': 'Medium',
     })
 
     const updatePopUpFilterApplicants = (field, values) => {
@@ -209,7 +246,8 @@ export default function InstitutionList(){
             'success-end': 0,
             'experience-start': 0,
             'experience-end': 0,
-            'platform' : 'Local'
+            'platform' : 'Local',
+            'rating': 'Medium',
         }
         setPopUpFilterApplicants(value)
         setSelectedValue({})
@@ -218,7 +256,7 @@ export default function InstitutionList(){
     //This code consists of codes to return necessary jsx for the each insitituoin
     //in the database system.
 
-    const institutionName =  Array.isArray(institutions)
+    const institutionName = Array.isArray(institutions)
         ? displayedData.map((institution, index) => {
             const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
             return (
@@ -284,20 +322,15 @@ export default function InstitutionList(){
     }) : null
 
     //This vraiable consists of the jsx to be returned and rendered for the search div.
-    const searchDiv = (
-        <div className="search-holder">
-            <div className="search-bar">
-                <BiSearchAlt className="search-icon"/>
-                <p>Search</p>
-            </div>
-        </div>
-    )
+
 
     //This is the return statement for the page and actually renders whatever is inside it.
     return (
         <div className="layout">
             <div className="left-div">
-                {searchDiv}
+                    <Search 
+                        iterable={eachInstitutionName}
+                    />
                 <div>
                     <div className="filter-options">
                         <div className="filter-con">
@@ -315,7 +348,7 @@ export default function InstitutionList(){
                     </div>
                     <div className="result-counter">
                         <p>Institution Found: {institutions ? institutions.length : 0} </p>
-                        <BiSolidSortAlt className="sort-icon"/>
+                        <BiSolidSortAlt className="sort-icon" onClick={handleSorting}/>
                     </div>
                     <div className="item-container">
                         { institutionName }
