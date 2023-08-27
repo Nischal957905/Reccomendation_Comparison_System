@@ -10,7 +10,9 @@ import error from "./middleware/error.js"
 import routeInstitute from './routes/institute.js'
 import routeComparison from "./routes/comparison.js"
 import routeCollege from "./routes/college.js"
+import routeSchool from "./routes/school.js"
 import routeAuth from "./routes/auth.js"
+import routeAdmin from "./routes/admin.js"
 import routeDiscussion from "./routes/discussion.js"
 import dbConnection from './config/dbConnection.js'
 import { logger, eventLogs } from './middleware/logger.js'
@@ -26,9 +28,11 @@ app.use(express.static('public')) //declaration of entrypoint directoyr file
 app.use('/',root); //declaration of routes path
 app.use('/auth', routeAuth)
 app.use('/institution', routeInstitute);
+app.use('/admin', routeAdmin)
 app.use('/discussion', routeDiscussion);
 app.use('/comparison', routeComparison);
 app.use('/college',routeCollege);
+app.use('/school', routeSchool)
 app.use(express.json())
 app.use(cookieParser())
 dbConnection()

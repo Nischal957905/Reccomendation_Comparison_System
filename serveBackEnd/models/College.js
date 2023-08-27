@@ -38,6 +38,9 @@ const collegeSchema = new mongoose.Schema({
   },
   longitude: {
     type: Number,
+  },
+  established: {
+    type: Date,
   }
 });
 

@@ -19,6 +19,13 @@ export const comparisonSlice = createApi({
               params: comparables,
             })
         }),
+        getComparisonSchool: builder.query({
+            query: (comparables) => ({
+              url: '/comparison/school',
+              method: "GET",
+              params: comparables,
+            })
+        }),
         getCompany: builder.query({
             query: (id) => `/comparison/${id}`, // Assuming this is your endpoint for fetching a single company
         }),
@@ -26,5 +33,5 @@ export const comparisonSlice = createApi({
 })
 
 export const {
-    useGetComparisonsQuery, useGetCompanyQuery, useGetComparisonCollegeQuery
+    useGetComparisonsQuery, useGetCompanyQuery, useGetComparisonCollegeQuery, useGetComparisonSchoolQuery
 } = comparisonSlice

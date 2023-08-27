@@ -184,11 +184,25 @@ const applyQuickFilter = (data, params) => {
     })
 }
 
+const reviewTotaling = (data) => {
+    let value = 0;
+    if(!data.length > 0){
+        return 0;
+    }
+    data.forEach(element => {
+        value += element.rating  
+    });
+
+    return value
+}
+
 const getInstitutionList = handleAsync(async (req, res) => {
     const filter = req.query
-
+  
     let institutions;
-    institutions = await Institution.find().select().lean();
+    let totalReview = [];
+    let reviews = [];
+    institutions = await Institution.find().select().sort({name: 1}).lean();
     const countryValid = await Institution.distinct('countries').lean(); 
     const countries = countryValid.filter((country) => country !== "");
     const speciality = await Institution.distinct('specialization').lean(); 
@@ -206,7 +220,7 @@ const getInstitutionList = handleAsync(async (req, res) => {
             institutions = await Institution.find({
                 countries: {$in: seperateString},
                 specialization: {$in: seperateSpecial}
-            }).select().lean();
+            }).select().sort({name: 1}).lean();
             status = true
             additionalStatus = false
         }
@@ -216,7 +230,7 @@ const getInstitutionList = handleAsync(async (req, res) => {
             const seperateString = arraySpecial.split(',');
             institutions = await Institution.find({
                 specialization: {$in: seperateString}
-            }).select().lean();
+            }).select().sort({name: 1}).lean();
             status = true
             additionalStatus = false
         }
@@ -226,7 +240,7 @@ const getInstitutionList = handleAsync(async (req, res) => {
             const seperateString = arraySpecial.split(',');
             institutions = await Institution.find({
                 countries: {$in: seperateString}
-            }).select().lean();
+            }).select().sort({name: 1}).lean();
             status = true
         }
         
@@ -243,6 +257,15 @@ const getInstitutionList = handleAsync(async (req, res) => {
         }
     }
 
+    // for(let i = 0; i<institutions.length; i++){
+    //     const review = await Review.find({
+    //         institution_code: institutions[i]._id
+    //     }).select().lean()
+    //     const totalPoints = reviewTotaling(review);
+    //     totalReview.push(totalPoints);
+    // }
+
+    //console.log(totalReview)
     return res.json({institutions, countries, status, speciality, additionalStatus, filter})
 })
 

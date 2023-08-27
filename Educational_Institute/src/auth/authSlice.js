@@ -12,9 +12,17 @@ export const authSlice = createApi({
               params: credentials,
             })
         }),
+        postRegister: builder.query({
+            query: (credentials) => ({
+              url: '/auth/register',
+              method: "POST",
+              params: credentials,
+            })
+        }),
     })
 })
 
 export const {
-    usePostLoginQuery
+    usePostLoginQuery,
+    usePostRegisterQuery
 } = authSlice

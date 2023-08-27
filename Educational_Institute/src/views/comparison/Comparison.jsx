@@ -4,6 +4,10 @@ import TextField from '@mui/material/TextField';
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import MessageProp from "../../components/utilities/MessageProp";
+
+//
+
 //Tabs
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -19,9 +23,14 @@ import { BarChart} from '@mui/x-charts'
 export default function Comparison() {
 
     const [selectedInstitution, setSelectedInstitution] = useState({});
+    const [delayedValue, setDelayedValue] = useState()
+
     const {
         data: institutionData,
-    } = useGetComparisonsQuery(selectedInstitution)
+        isLoading,
+        isSuccess,
+        error
+    } = useGetComparisonsQuery(delayedValue)
 
     const {scoreObject} = institutionData ? institutionData : []
 
@@ -59,9 +68,28 @@ export default function Comparison() {
         })
     }
 
-    const addComparison = () => {
-        setCount((prevVal) => {
-            return prevVal + 1
+    //Message
+
+    const [messagePop, setMessagePop] = useState(false)
+    const [display, setDisplay] = useState({
+        message: '',
+        severity: '',
+    })
+    const destroyPopMessage = (event,reason) => {
+        if(reason === 'clickaway'){
+            return;
+        }
+        setMessagePop(false)
+    }
+
+    const showPopMessage = () => {
+        setMessagePop(true)
+    }
+
+    const handleMessageType = (value, severity) => {
+        setDisplay({
+            message: value,
+            severity: severity
         })
     }
 
@@ -71,12 +99,40 @@ export default function Comparison() {
         setTabValue(newVal)
     }
 
-    const compareInstitution = () => {
+    const addComparison = () => {
+        if(count == 1){
+            handleMessageType('Can not exceed the 3 institutions', 'error')
+            showPopMessage()
+        }
+        if(count < 1) {
+            setCount((prevVal) => {
+                return prevVal + 1
+            })
+        }
+    }
 
+    const handleClickCompare = () => {
+        if(Object.keys(selectedInstitution).length > 1 && Object.keys(selectedInstitution).length < 4){
+            setDelayedValue(selectedInstitution)
+        }
+        if(isSuccess){
+            handleMessageType('Institution Successfuly compared!','success')
+            showPopMessage()
+        }
+        if(error){
+            handleMessageType('some error occured','error')
+            showPopMessage()
+        }
     }
 
     return(
         <div>
+            <MessageProp 
+                stateValue={messagePop}
+                destroy={destroyPopMessage}
+                messageType={display.severity}
+                message={display.message}
+            />
             <div>
                 <Autocomplete
                     disablePortal
@@ -116,7 +172,7 @@ export default function Comparison() {
                 ))
             }
             <button onClick={addComparison}>Add+</button>
-            <button>Minus -</button>
+            <button onClick={handleClickCompare}>Compare</button>
             
             <div>
                 {
