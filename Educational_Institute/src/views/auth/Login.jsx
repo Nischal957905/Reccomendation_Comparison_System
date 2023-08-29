@@ -31,11 +31,13 @@ export default function Login(){
             const token = data?.tokenForAccess;
             const userVerify = data?.userVerify;
             const username = data?.user?.username;
-            const password = data?.user?.password;
+            const roles = data?.roles?.role_name;
             if(data.userVerify){
-                localStorage.setItem('username', JSON.stringify(username));
-                setValueForAuth({'username': username})
-                //localStorage.clear()
+                localStorage.clear()
+                localStorage.setItem('username', username);
+                localStorage.setItem('login',true)
+                localStorage.setItem('role', roles)
+                setValueForAuth({'username': username,'login':true,})
                 setFormData({
                     username: '',
                     password: '',

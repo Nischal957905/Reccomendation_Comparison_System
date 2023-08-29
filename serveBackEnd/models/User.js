@@ -4,7 +4,6 @@ import mongoose from 'mongoose';
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
   },
   location: {
     type: String,
@@ -23,6 +22,9 @@ const userSchema = new mongoose.Schema({
   },
   longitude: {
     type: Number,
+  },
+  status: {
+    type: String,
   }
 });
 

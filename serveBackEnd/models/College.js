@@ -41,6 +41,9 @@ const collegeSchema = new mongoose.Schema({
   },
   established: {
     type: Date,
+  },
+  ugc: {
+    type: String,
   }
 });
 

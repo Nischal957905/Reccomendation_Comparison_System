@@ -29,7 +29,7 @@ import Filter from "../../components/filter/Filter"
 import SchoolPop from "../../components/utilities/SchoolPop"
 import { Link } from 'react-router-dom'
 import Paginate from "../../components/pagination/Paginate"
-
+import Search from "../../components/utilities/Search";
 
 
 export default function CollegeList(){
@@ -82,6 +82,7 @@ export default function CollegeList(){
         'distance': 'Near',
     })
 
+    const eachInstitutionName = isSuccess && colleges.map(item => item.name)
 
     const updatePopUpFilterApplicants = (field, values) => {
         setPopUpFilterApplicants((prevVal, index) => {
@@ -254,7 +255,12 @@ export default function CollegeList(){
     return(
         <div className="layout">
             <div className="left-div">
-                {searchDiv}
+                {   isSuccess &&
+                    <Search 
+                    iterable={eachInstitutionName}
+                    category='college'
+                    />   
+                }
                 <div>
                     <div className="filter-options">
                         <div className="filter-con">

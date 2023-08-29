@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
-export default function Search({iterable}){
+export default function Search({iterable,category}){
 
     const [insitution, setInstitution] = useState()
     const navigate = useNavigate()
@@ -14,7 +14,9 @@ export default function Search({iterable}){
     }
 
     const handleSearch = ()=>{
-        navigate(`/institution/${insitution}`)
+        if(insitution && insitution !== ''){
+            navigate(`/${category}/${insitution}`)
+        }
     }
 
     // const searchDiv = (
