@@ -9,8 +9,6 @@ const PopMessage = React.forwardRef((props, ref) => {
 
 export default function MessageProp({stateValue,messageType,message,destroy}){
 
-  console.log(stateValue)
-  console.log(message)
     return (
         <Stack spacing={2} sx={{ width: '100%' }}>
           <Snackbar open={stateValue} autoHideDuration={6000} onClose={destroy}>

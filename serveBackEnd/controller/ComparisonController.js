@@ -157,7 +157,17 @@ const getComparisonList = handleAsync(async (req, res) => {
     let totalExpPoint = 0;
     let totalSucessPoint = 0;
 
+    let checkValue = true;
+
     if(Object.keys(insObject).length !== 0){
+        checkValue = checkValues(insObject)
+    }
+
+    if(!checkValue){
+        res.status(405).json({ error: 'Empty Value not accepted.' });
+    }
+
+    if(Object.keys(insObject).length !== 0 && checkValue){
         for(let iterator in insObject){
             if(insObject.hasOwnProperty(iterator)){
                 const comparisonInstitution = await Institution.find(
@@ -172,7 +182,7 @@ const getComparisonList = handleAsync(async (req, res) => {
         }
     }  
 
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         fullObject.forEach((item,index) => {
             
             totalUniPoint += item.universities
@@ -191,7 +201,7 @@ const getComparisonList = handleAsync(async (req, res) => {
         });
     }
     
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         fullObject.forEach((item,index) => {
             const reviews = fullReviews[index]
 
@@ -247,32 +257,51 @@ const getComparisonList = handleAsync(async (req, res) => {
     const institutions = await Institution.find().select().lean();
     const institutionsName = await Institution.distinct('name').lean();
 
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         return res.json({institutions, institutionsName,scoreObject})
     }
     return res.json({institutions, institutionsName})
 })
+
+const checkValues = (val) => {
+    return Object.values(val).every(item => item !== '' && item !== null);
+}
 
 const getCollegeComparisonList = handleAsync(async (req, res) => {
 
     const insObject = req.query
     let fullObject = [];
     let scoreObject = [];
+    let fullReviews = [];
 
     //Experience Oriented
     let totalExpPoint = 0;
+    let checkValue = true;
 
     if(Object.keys(insObject).length !== 0){
+        checkValue = checkValues(insObject)
+    }
+
+    if(!checkValue){
+        res.status(405).json({ error: 'Empty Value not accepted.' });
+    }
+
+    if(Object.keys(insObject).length !== 0 && checkValue){
         for(let iterator in insObject){
             if(insObject.hasOwnProperty(iterator)){
                 const comparisonInstitution = await College.find(
                     {name: insObject[iterator]}).select().lean()
                 fullObject.push(comparisonInstitution[0])
+
+                const reviews = await Review.find({
+                    institution_code: comparisonInstitution[0]._id
+                }).select().lean()
+                fullReviews.push(reviews)
             }
         }
     }  
     
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         fullObject.forEach(item => {
             if(item.experience === ""){
                 totalExpPoint = totalExpPoint + 0;
@@ -283,8 +312,14 @@ const getCollegeComparisonList = handleAsync(async (req, res) => {
         });
     }
     
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         fullObject.forEach((item,index) => {
+
+            const reviews = fullReviews[index]
+
+            const reviewPoint = reviewPointHandler(
+                reviews
+            )
             
             const expPoint = experienceCollegePointHandler(
                 totalExpPoint,
@@ -314,7 +349,8 @@ const getCollegeComparisonList = handleAsync(async (req, res) => {
                 experience: expPoint,
                 access: accessPoint,
                 institution: item,
-                distanceMetre: distance
+                distanceMetre: distance,
+                review: reviewPoint,
             })
         });
     }
@@ -322,7 +358,7 @@ const getCollegeComparisonList = handleAsync(async (req, res) => {
     const institutions = await College.find().select().lean();
     const institutionsName = await College.distinct('name').lean();
 
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         return res.json({institutions, institutionsName,scoreObject})
     }
     return res.json({institutions, institutionsName})
@@ -333,21 +369,37 @@ const getSchoolComparisonList = handleAsync(async (req, res) => {
     const insObject = req.query
     let fullObject = [];
     let scoreObject = [];
+    let fullReviews = [];
 
     //Experience Oriented
     let totalExpPoint = 0;
 
+    let checkValue = true;
+
     if(Object.keys(insObject).length !== 0){
+        checkValue = checkValues(insObject)
+    }
+
+    if(!checkValue){
+        res.status(405).json({ error: 'Empty Value not accepted.' });
+    }
+
+    if(Object.keys(insObject).length !== 0 && checkValue){
         for(let iterator in insObject){
             if(insObject.hasOwnProperty(iterator)){
                 const comparisonInstitution = await School.find(
                     {name: insObject[iterator]}).select().lean()
                 fullObject.push(comparisonInstitution[0])
+
+                const reviews = await Review.find({
+                    institution_code: comparisonInstitution[0]._id
+                }).select().lean()
+                fullReviews.push(reviews)
             }
         }
     }  
     
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         fullObject.forEach(item => {
             if(item.experience === ""){
                 totalExpPoint = totalExpPoint + 0;
@@ -358,8 +410,14 @@ const getSchoolComparisonList = handleAsync(async (req, res) => {
         });
     }
     
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         fullObject.forEach((item,index) => {
+
+            const reviews = fullReviews[index]
+
+            const reviewPoint = reviewPointHandler(
+                reviews
+            )
             
             const expPoint = experienceCollegePointHandler(
                 totalExpPoint,
@@ -389,7 +447,8 @@ const getSchoolComparisonList = handleAsync(async (req, res) => {
                 experience: expPoint,
                 access: accessPoint,
                 institution: item,
-                distanceMetre: distance
+                distanceMetre: distance,
+                review: reviewPoint,
             })
         });
     }
@@ -397,7 +456,7 @@ const getSchoolComparisonList = handleAsync(async (req, res) => {
     const institutions = await School.find().select().lean();
     const institutionsName = await School.distinct('name').lean();
 
-    if(fullObject.length > 0){
+    if(fullObject.length > 0 && checkValue){
         return res.json({institutions, institutionsName,scoreObject})
     }
     return res.json({institutions, institutionsName})

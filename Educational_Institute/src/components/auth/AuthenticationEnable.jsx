@@ -5,6 +5,7 @@ const AuthenticationEnable = () => {
 
     const { valueForAuth } = useAuthentication()
     const location = useLocation()
+    console.log(location)
 
     return (
         valueForAuth?.username

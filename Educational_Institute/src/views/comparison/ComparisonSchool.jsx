@@ -4,6 +4,7 @@ import TextField from '@mui/material/TextField';
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
+import MessageProp from "../../components/utilities/MessageProp";
 //Tabs
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -19,17 +20,21 @@ import { BarChart} from '@mui/x-charts'
 export default function ComparisonSchool() {
 
     const [selectedInstitution, setSelectedInstitution] = useState({});
+    const [delayedValue, setDelayedValue] = useState()
+
     const {
         data: institutionData,
-    } = useGetComparisonSchoolQuery(selectedInstitution)
+        isSuccess,
+        error
+    } = useGetComparisonSchoolQuery(delayedValue)
 
 
     const {scoreObject} = institutionData ? institutionData : []
-    console.log(scoreObject)
 
     let experienceArray = [];
     let accessArray = [];
     let totalArray = [];
+    let ratingArray =  [];
     let label = [];
 
     if(scoreObject){
@@ -37,9 +42,11 @@ export default function ComparisonSchool() {
 
             const experiencePoint = item.experience !== null ? item.experience : 10;
             const accesPoint = item.access !== null ? item.access : 10;
+            const reviewPoint = item.review !== null ? item.review : 0;
             experienceArray.push(experiencePoint)
             accessArray.push(accesPoint)
-            totalArray.push(experiencePoint + accesPoint)
+            ratingArray.push(item.review)
+            totalArray.push(experiencePoint + accesPoint + reviewPoint)
             label.push(item.institution.name)
         });
     }
@@ -57,9 +64,26 @@ export default function ComparisonSchool() {
         })
     }
 
-    const addComparison = () => {
-        setCount((prevVal) => {
-            return prevVal + 1
+    const [messagePop, setMessagePop] = useState(false)
+    const [display, setDisplay] = useState({
+        message: '',
+        severity: '',
+    })
+    const destroyPopMessage = (event,reason) => {
+        if(reason === 'clickaway'){
+            return;
+        }
+        setMessagePop(false)
+    }
+
+    const showPopMessage = () => {
+        setMessagePop(true)
+    }
+
+    const handleMessageType = (value, severity) => {
+        setDisplay({
+            message: value,
+            severity: severity
         })
     }
 
@@ -69,14 +93,53 @@ export default function ComparisonSchool() {
         setTabValue(newVal)
     }
 
-    const compareInstitution = () => {
-
+    
+    const addComparison = () => {
+        if(count == 1){
+            handleMessageType('Can not exceed the 3 institutions', 'error')
+            showPopMessage()
+        }
+        if(count < 1) {
+            setCount((prevVal) => {
+                return prevVal + 1
+            })
+        }
     }
 
-    console.log(scoreObject);
+    const handleClickCompare = () => {
+        if(Object.keys(selectedInstitution).length > 1 && Object.keys(selectedInstitution).length < 4){
+            const objectLength = selectedInstitution.length;
+            const check = checkValue(selectedInstitution)
+            if(check){
+                setDelayedValue(selectedInstitution)
+                if(isSuccess){
+                    handleMessageType('Institution Successfuly compared!','success')
+                    showPopMessage()
+                }
+            }
+            else{
+                handleMessageType('Empty Values are not allowed','error')
+                showPopMessage()
+            }
+        }
+        if(error){
+            handleMessageType('some error occured','error')
+            showPopMessage()
+        }
+    }
 
+    const checkValue = (val) => {
+        return Object.values(val).every(item => item !== '' && item !== null);
+    }
+    
     return(
         <div>
+            <MessageProp 
+                stateValue={messagePop}
+                destroy={destroyPopMessage}
+                messageType={display.severity}
+                message={display.message}
+            />
             <div>
                 <Autocomplete
                     disablePortal
@@ -116,7 +179,7 @@ export default function ComparisonSchool() {
                 ))
             }
             <button onClick={addComparison}>Add+</button>
-            <button>Minus -</button>
+            <button onClick={handleClickCompare}>Compare</button>
             
             <div>
                 {
@@ -127,7 +190,8 @@ export default function ComparisonSchool() {
                             <TabList onChange={tabSwappingHandler}>
                                 <Tab value="1" label="Experience"/>
                                 <Tab value="2" label="Accessibility"/>
-                                <Tab value="3" label="Overall"/>
+                                <Tab value="3" label="Rating"/>
+                                <Tab value="4" label="Overall"/>
                             </TabList>
                         </Box>
                         <TabPanel value="1">
@@ -165,6 +229,23 @@ export default function ComparisonSchool() {
                             />
                         </TabPanel>
                         <TabPanel value="3">
+                            <BarChart
+                                xAxis={[
+                                    {
+                                        id: 'ratingCategories',
+                                        data: label,
+                                        scaleType: 'band',
+                                    }
+                                ]}
+                                series={[
+                                    {
+                                        data: ratingArray
+                                    }
+                                ]}
+                                height={400}
+                            />
+                        </TabPanel>
+                        <TabPanel value="4">
                             <BarChart
                                 xAxis={[
                                     {

@@ -5,7 +5,7 @@ import useAuthentication from '../../components/hooks/useAuthentication'
 export default function Post(){
 
     const [filter, setFilter] = useState({
-        tag: 'None',
+        tag: '',
         dateSort: 'Latest',
         popular: 'none'
     })
@@ -24,7 +24,7 @@ export default function Post(){
     const [formValue, setFormValue] = useState({
         'username': valueForAuth.username,
         'post': '',
-        'tag': 'basbas',
+        'tag': '',
     })
     const [delayedValue, setDelayedValue] = useState({})
     const [commentTrack, setCommentTrack] = useState()
@@ -46,6 +46,11 @@ export default function Post(){
 
     useEffect(() => {
         if(newData){
+            setFormValue({
+                'username': valueForAuth.username,
+                'post': '',
+                'tag': '',
+            })
             refetch()
         }
     },[newData])
@@ -207,14 +212,17 @@ export default function Post(){
                                 type='text' 
                                 name='post' 
                                 value={formValue.post} 
+                                required
                                 onChange={onChangeHandle}/>
                         </div>
                         <div>
                             <label>Tags</label>
-                            <select name='tag' onChange={onChangeHandle} value={formValue.tag}>
-                                <option value='Study lane International Education Consultancy'>Study</option>
-                                <option value='basbas'>basbas</option>
-                            </select>
+                            <input 
+                                name='tag' 
+                                onChange={onChangeHandle} 
+                                value={formValue.tag} 
+                                required
+                            />
                         </div>
                         <button>Post</button>
                     </form>

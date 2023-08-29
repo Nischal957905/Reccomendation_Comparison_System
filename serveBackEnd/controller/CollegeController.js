@@ -1,14 +1,31 @@
 import { query } from 'express'
 import College from '../models/College.js'
+import Review from '../models/Review.js'
 import handleAsync from 'express-async-handler'
 import * as turf from '@turf/turf'
 
 const getSingleCollege = handleAsync(async (req, res) => {
     try {
         const college = req.params.college
-        console.log(college)
-        const collegeData = await College.findOne({name: college}).lean()
-        return res.json(collegeData)
+        if(college){
+            const institutionData = await College.findOne({name: college}).lean()
+
+            const positiveReview = await Review.find({
+                institution_code: institutionData._id,
+                rating_classification: "Positive"
+            }).select().lean().limit(5)
+    
+            const negativeReview = await Review.find({
+                institution_code: institutionData._id,
+                rating_classification: "Negative"
+            }).select().lean().limit(5)
+
+
+            return res.json({institutionData, positiveReview, negativeReview})
+        }
+        else{
+            return res.status(404).json({error: 'Page not Found'});
+        }
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }

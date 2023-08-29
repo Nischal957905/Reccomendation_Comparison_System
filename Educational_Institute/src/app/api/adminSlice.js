@@ -43,6 +43,13 @@ export const adminSlice = createApi({
             params: details,
           })  
         }),
+        getUserList: builder.query({
+          query: (details) => ({
+            url: '/admin/user',
+            method: "GET",
+            params: details,
+          })  
+        }),
         editPostInstitution: builder.query({
           query: ({institution,delayedData}) => ({
               url: `/admin/edit/institution/${institution}`,
@@ -63,6 +70,20 @@ export const adminSlice = createApi({
               method: "POST",
               params: delayedData,
             }),
+        }),
+        editPostUser: builder.query({
+          query: ({institution,delayedData}) => ({
+              url: `/admin/edit/user/${institution}`,
+              method: "POST",
+              params: delayedData,
+            }),
+        }),
+        inactivateUser: builder.query({
+          query: (user) => ({
+              url: `/admin/active`,
+              method: "POST",
+              params: user,
+            }),
         })
     })
 })
@@ -76,5 +97,8 @@ export const {
     useDeletePostAdminQuery,
     useEditPostCollegeQuery,
     useEditPostInstitutionQuery,
-    useEditPostSchoolQuery
+    useEditPostSchoolQuery,
+    useGetUserListQuery,
+    useEditPostUserQuery,
+    useInactivateUserQuery
 } = adminSlice

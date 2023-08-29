@@ -46,11 +46,12 @@ export default function Comparison() {
             const servicePoint = item.service !== null ? item.service : 10
             const experiencePoint = item.experience !== null ? item.experience : 10;
             const accesPoint = item.access !== null ? item.access : 10;
+            const reviewPoint = item.review !== null ? item.review : 0;
             serviceArray.push(servicePoint)
             experienceArray.push(experiencePoint)
             accessArray.push(accesPoint)
             ratingArray.push(item.review)
-            totalArray.push(servicePoint + experiencePoint + accesPoint)
+            totalArray.push(servicePoint + experiencePoint + accesPoint + reviewPoint)
             label.push(item.institution.name)
         });
     }
@@ -111,13 +112,25 @@ export default function Comparison() {
         }
     }
 
+    const checkValue = (val) => {
+        return Object.values(val).every(item => item !== '' && item !== null);
+    }
+
     const handleClickCompare = () => {
         if(Object.keys(selectedInstitution).length > 1 && Object.keys(selectedInstitution).length < 4){
-            setDelayedValue(selectedInstitution)
-        }
-        if(isSuccess){
-            handleMessageType('Institution Successfuly compared!','success')
-            showPopMessage()
+            const objectLength = selectedInstitution.length;
+            const check = checkValue(selectedInstitution)
+            if(check){
+                setDelayedValue(selectedInstitution)
+                if(isSuccess){
+                    handleMessageType('Institution Successfuly compared!','success')
+                    showPopMessage()
+                }
+            }
+            else{
+                handleMessageType('Empty Values are not allowed','error')
+                showPopMessage()
+            }
         }
         if(error){
             handleMessageType('some error occured','error')

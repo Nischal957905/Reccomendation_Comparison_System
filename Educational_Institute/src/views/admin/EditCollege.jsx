@@ -32,6 +32,7 @@ export default function EditCollege(){
         setDelayedData(postData)
     }
 
+    console.log(data)
     
     useEffect(() => {
         if(isSuccess){
@@ -47,10 +48,8 @@ export default function EditCollege(){
                 success: data.success,
                 edit: true,
                 id: data._id,
-                opening: data.opening_time,
-                closing: data.closing_time,
                 ownership: data.ownership === " community Institution " ? "Public" : "Private",
-                accreditation: data.accreditation
+                accreditation: data.ugc === " ✓ UGC Accredited" ? "Ugc" : "None"
             })
         }
     },[data])
@@ -135,26 +134,6 @@ export default function EditCollege(){
                             type="text"
                             name="website"
                             value={postData.website}
-                            onChange={handleChangePostData}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Opening Time</label>
-                        <input
-                            type="time"
-                            name="opening"
-                            value={postData.opening}
-                            onChange={handleChangePostData}
-                            required
-                        />
-                    </div>
-                    <div>
-                        <label>Closing Time</label>
-                        <input
-                            type="time"
-                            name="closing"
-                            value={postData.closing}
                             onChange={handleChangePostData}
                             required
                         />

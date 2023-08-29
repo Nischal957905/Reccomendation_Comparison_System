@@ -220,7 +220,7 @@ const getInstitutionList = handleAsync(async (req, res) => {
             institutions = await Institution.find({
                 countries: {$in: seperateString},
                 specialization: {$in: seperateSpecial}
-            }).select().sort({name: 1}).lean();
+            }).select({name: 1, _id: 1}).sort({name: 1}).lean();
             status = true
             additionalStatus = false
         }
@@ -230,7 +230,7 @@ const getInstitutionList = handleAsync(async (req, res) => {
             const seperateString = arraySpecial.split(',');
             institutions = await Institution.find({
                 specialization: {$in: seperateString}
-            }).select().sort({name: 1}).lean();
+            }).select({name: 1, _id: 1}).sort({name: 1}).lean();
             status = true
             additionalStatus = false
         }
@@ -240,7 +240,7 @@ const getInstitutionList = handleAsync(async (req, res) => {
             const seperateString = arraySpecial.split(',');
             institutions = await Institution.find({
                 countries: {$in: seperateString}
-            }).select().sort({name: 1}).lean();
+            }).select({name: 1, _id: 1}).sort({name: 1}).lean();
             status = true
         }
         
@@ -272,19 +272,24 @@ const getInstitutionList = handleAsync(async (req, res) => {
 const getSingleInstitution = handleAsync(async (req, res) => {
     try {
         const institution = req.params.institution
-        const institutionData = await Institution.findOne({name: institution}).lean()
+        if(institution){
+            const institutionData = await Institution.findOne({name: institution}).lean()
 
-        const positiveReview = await Review.find({
-            institution_code: institutionData._id,
-            rating_classification: "Positive"
-        }).select().lean().limit(5)
+            const positiveReview = await Review.find({
+                institution_code: institutionData._id,
+                rating_classification: "Positive"
+            }).select().lean().limit(5)
     
-        const negativeReview = await Review.find({
-            institution_code: institutionData._id,
-            rating_classification: "Negative"
-        }).select().lean().limit(5)
+            const negativeReview = await Review.find({
+                institution_code: institutionData._id,
+                rating_classification: "Negative"
+            }).select().lean().limit(5)
 
-        return res.json({institutionData, positiveReview, negativeReview})
+            return res.json({institutionData, positiveReview, negativeReview})
+        }
+        else{
+            return res.status(404).json({error: 'Page not Found'});
+        }
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -294,7 +299,8 @@ const createReviewRating = handleAsync(async (req,res) => {
 
     const review = req.query;
     const reviewComment = review.review
-    const user = review.username && review.username.replace(/^"|"$/g, '');
+    const user = review.username;
+
     const institution = review.institution;
 
     const rating = review.rating && parseFloat(review.rating)
@@ -307,6 +313,15 @@ const createReviewRating = handleAsync(async (req,res) => {
     }).select().lean()
 
     let status = false;
+
+    if(existence && review.review && review.username){
+        const data = {username: user, institution_code: institution}
+        const update = {review: reviewComment, rating: rating, rating_classification: review_class}
+        const up = await Review.findOneAndUpdate(data, update,{
+            new: true
+        })
+        status = true
+    }
     
     if(!existence && review.review && review.username){
         const newReview = await Review.create({

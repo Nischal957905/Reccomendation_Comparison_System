@@ -19,9 +19,23 @@ export const discussionSlice = createApi({
               params: details,
             })
         }),
+        postUserDiscussions: builder.query({
+            query: (details) => ({
+              url: '/discussion/user/post',
+              method: "POST",
+              params: details,
+            })
+        }),
+        deleteUserDiscussions: builder.query({
+          query: (details) => ({
+            url: '/discussion/delete/post',
+            method: "POST",
+            params: details,
+          })
+      }),
     })
 })
 
 export const {
-    useGetDiscussionsQuery, usePostDiscussionsQuery
+    useGetDiscussionsQuery, usePostDiscussionsQuery, usePostUserDiscussionsQuery, useDeleteUserDiscussionsQuery
 } = discussionSlice
