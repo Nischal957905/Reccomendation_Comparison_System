@@ -1,18 +1,82 @@
 import  { useParams } from 'react-router-dom'
-import { useGetSingleCollegeQuery } from "../../app/api/appSlice"
+import { useGetSingleCollegeQuery,  usePostReviewQuery } from "../../app/api/appSlice"
 import GoogleMap from '../../components/utilities/GoogleMap';
+import { useState, useEffect } from 'react';
+import Rating from "@mui/material/Rating";
 
 export default function InstitutionPage() {
 
     const { college } = useParams();
+
+    const institution = college;
+    const username = localStorage.getItem('username')
+    const [delayedData, setDelayedData] = useState({})
     
     const {
         data,
         isLoading,
         isSuccess,
         isError,
-        error
+        error,
+        refetch
     } = useGetSingleCollegeQuery(college);
+ 
+    const [reviewData, setReviewData] = useState({
+        'username' : username,
+        'rating': 0,
+        'review': '',
+        'institution': null
+    })
+
+    const {
+        data: dataReview,
+        isLoading: loaded,
+        isSuccess: success,
+        isError: errors,
+    } = usePostReviewQuery({institution, delayedData})
+    
+    useEffect(() => {
+        if(isSuccess){
+            setReviewData((prevVal) => {
+                return {
+                    ...prevVal,
+                    'institution' : data.institutionData._id
+                }
+            })
+        }
+    }, [isSuccess])
+
+    useEffect(() => {
+        if(success){
+            refetch()
+        }
+    },[dataReview])
+
+    const handleOnSubmit = (event) => {
+        event.preventDefault()
+        if(reviewData.review && reviewData.review !== ''){
+            setDelayedData(reviewData)
+        }
+    }
+
+    const ratingHandleChange = (event,newValue) => {
+        setReviewData((prevVal) => {
+            return {
+                ...prevVal,
+                'rating' : newValue,
+            }
+        })
+    }
+
+    const handleOnChange = (event) => {
+        const {name, value} = event.target;
+        setReviewData((prevVal) => {
+            return {
+                ...prevVal,
+                [name] : value,
+            }
+        })
+    }
 
     let imagesDirectory;
 
@@ -28,13 +92,13 @@ export default function InstitutionPage() {
                 </div>
                 <div className='fields-holder'>
                     <div>
-                        accrecreditation: {data && data.accreditation}
+                        accrecreditation: {data && data?.institutionData.accreditation}
                     </div>
                     <div>
-                        established at: {data && data.established !== '' ? data.established : "Not shown" }    
+                        established at: {data && data?.institutionData.established !== '' ? data?.institutionData.established : "Not shown" }    
                     </div>
                     <div>
-                        experience: {data && data.experience !== '' ? data.experience : "Now shown"}    
+                        experience: {data && data?.institutionData.experience !== '' ? data?.institutionData.experience : "Now shown"}    
                     </div>
                 </div>
             </div>
@@ -47,16 +111,16 @@ export default function InstitutionPage() {
                     <h3>Features</h3>
                     <ul>
                         {
-                            data && data.ownership && data.ownership === 'private Institution' ? (
+                            data && data?.institutionData.ownership && data?.institutionData.ownership === 'private Institution' ? (
                                 <li>This institution is a privately owned institution</li>
                             ) : <li>This institution is a ppublicly owned institution</li>}
                         {
-                            data && data.established && data.established !== '' ? (
-                            <li>It was established at {data.established}</li>
+                            data && data?.institutionData.established && data?.institutionData.established !== '' ? (
+                            <li>It was established at {data?.institutionData.established}</li>
                             ) : null}
                         {
-                            data && data.experience !== '' ? (
-                                <li>This college has the experience of {data.experience} years</li>
+                            data && data?.institutionData.experience !== '' ? (
+                                <li>This college has the experience of {data?.institutionData.experience} years</li>
                             ) : null
                         } 
                     
@@ -64,12 +128,66 @@ export default function InstitutionPage() {
                 </div>
             </div>
             {
-                data && 
+                data && data?.institutionData.latitude && data?.institutionData.latitude !== '' &&
                 <GoogleMap 
-                    lat={data.latitude}
-                    long = {data.longitude}
+                    lat={data.institutionData.latitude}
+                    long = {data.institutionData.longitude}
                 />
-            }                
+            }  
+             <div className='post-review'>
+                <form onSubmit={handleOnSubmit}>
+                    <div className='review'>
+                        <label>Review</label>
+                        <input
+                            name='review'
+                            value={reviewData.review}
+                            type='text'
+                            onChange={handleOnChange}
+                        />
+                    </div>
+                    <div className='rating'>
+                        <Rating
+                            precision={0.5}
+                            name='rating'
+                            value={reviewData.rating}
+                            onChange={ratingHandleChange}
+                        />
+                    </div>
+                    <button>Submit Review</button>
+                </form> 
+            </div> 
+            <div>
+                {
+                    data && data?.positiveReview.length > 0 && <h1>Postive Reviews</h1> }
+                {
+                    data && data?.positiveReview.length > 0 &&
+                    data.positiveReview.map((item,index) => {
+                        return(
+                            <div key={index}>
+                                <p>{item.review}</p>
+                                <p>By {item.username}</p>
+                                <p>{item.rating} star</p>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            <div>
+                {
+                    data && data?.negativeReview.length > 0 && <h1>Negative Reviews</h1> }
+                {
+                    data && data?.negativeReview.length > 0 &&
+                    data.negativeReview.map((item,index) => {
+                        return(
+                            <div key={index}>
+                                <p>{item.review}</p>
+                                <p>By {item.username}</p>
+                                <p>{item.rating} star</p>
+                            </div>
+                        )
+                    })
+                }
+            </div>             
         </div>
     )
 }

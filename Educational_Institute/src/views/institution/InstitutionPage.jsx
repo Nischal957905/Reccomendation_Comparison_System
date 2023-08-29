@@ -16,7 +16,8 @@ export default function InstitutionPage() {
         isLoading,
         isSuccess,
         isError,
-        error
+        error,
+        refetch
     } = useGetSingleInstitutionQuery(institution);
 
     const [reviewData, setReviewData] = useState({
@@ -44,6 +45,12 @@ export default function InstitutionPage() {
         isError: errors,
     } = usePostReviewQuery({institution, delayedData})
     //console.log(reveiwData.positiveReview)
+
+    useEffect(() => {
+        if(success){
+            refetch()
+        }
+    },[dataReview])
 
     
     const renderPositiveReview = success && dataReview.status && dataReview?.positiveReview.length > 0 ?
@@ -91,7 +98,9 @@ export default function InstitutionPage() {
 
     const handleOnSubmit = (event) => {
         event.preventDefault()
-        setDelayedData(reviewData)
+        if(reviewData.review && reviewData.review !== ''){
+            setDelayedData(reviewData)
+        }
     }
 
     const ratingHandleChange = (event,newValue) => {
@@ -208,7 +217,7 @@ export default function InstitutionPage() {
                 </div>
             </div>
             {
-                data && 
+                data && data?.institutionData.latitude !== '' && data?.institutionData.latitude &&
                 <GoogleMap 
                     lat={data.institutionData.latitude}
                     long = {data.institutionData.longitude}
@@ -236,6 +245,39 @@ export default function InstitutionPage() {
                     <button>Submit Review</button>
                 </form> 
             </div>
+            <div>
+                {
+                    data && data?.positiveReview.length > 0 && <h1>Postive Reviews</h1> }
+                {
+                    data && data?.positiveReview.length > 0 &&
+                    data.positiveReview.map((item,index) => {
+                        return(
+                            <div key={index}>
+                                <p>{item.review}</p>
+                                <p>By {item.username}</p>
+                                <p>{item.rating} star</p>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+            <div>
+                {
+                    data && data?.negativeReview.length > 0 && <h1>Negative Reviews</h1> }
+                {
+                    data && data?.negativeReview.length > 0 &&
+                    data.negativeReview.map((item,index) => {
+                        return(
+                            <div key={index}>
+                                <p>{item.review}</p>
+                                <p>By {item.username}</p>
+                                <p>{item.rating} star</p>
+                            </div>
+                        )
+                    })
+                }
+            </div>
+
         </div>
     )
 }

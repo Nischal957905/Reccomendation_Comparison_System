@@ -29,6 +29,7 @@ import Filter from "../../components/filter/Filter"
 import SchoolPop from "../../components/utilities/SchoolPop"
 import { Link } from 'react-router-dom'
 import Paginate from "../../components/pagination/Paginate"
+import Search from "../../components/utilities/Search";
 
 
 
@@ -113,6 +114,8 @@ export default function SchoolList(){
         setPopMenuOpen(false)
     }
 
+    const eachInstitutionName = isSuccess && colleges.map(item => item.name)
+
     const popMenuClearHandler = () => {
         const value = {
             'opening-time' : '00:00:00',
@@ -137,15 +140,15 @@ export default function SchoolList(){
             
                 return {
                     name: institution.name,
-                    experience: experience <= 5 && experience >= 2
+                    experience: experience <= 10 && experience >= 2
                                     ? 3
-                                    : experience <= 10
+                                    : experience <= 17
                                     ? 5
-                                    : experience <= 15
-                                    ? 7
                                     : experience <= 20
+                                    ? 7
+                                    : experience <= 25
                                     ? 10
-                                    : experience > 20
+                                    : experience > 30
                                     ? 13
                                     :0,
                 }
@@ -254,12 +257,17 @@ export default function SchoolList(){
     return(
         <div className="layout">
             <div className="left-div">
-                {searchDiv}
+                {   isSuccess &&
+                    <Search 
+                    iterable={eachInstitutionName}
+                    category='school'
+                    />   
+                }
                 <div>
                     <div className="filter-options">
                         <div className="filter-con">
                             <form onSubmit={submitFilters}>
-                                <div className="filter-ucg"><Filter fieldName="ugc" update={updateFilters}  options={[' ✓ UGC Accredited',' ✓ UGC Non-Accredited']} values={selectedValue.ugc || [] }/></div>
+                                <div className="filter-ucg"><Filter fieldName="ugc" update={updateFilters}  options={['Cambridge GCE A Levels','National Examinations Board','Scottish Qualifications Authority','Tourism School Salzburg, Austria','CTEVT']} values={selectedValue.ugc || [] }/></div>
                                 <div className="filter-experience"><Filter fieldName="experience" update={updateFilters} options={['High','Low','Moderate']} values={selectedValue.experience || [] }/></div>
                                 <div className="filter-ownership"><Filter fieldName="ownership" update={updateFilters} options={[' community Institution ',' private Institution ']} values={selectedValue.ownership || [] }/></div>
                                 <button>Apply</button>

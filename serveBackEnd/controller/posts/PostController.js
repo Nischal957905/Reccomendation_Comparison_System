@@ -1,5 +1,6 @@
 import { query } from 'express'
 import handleAsync from 'express-async-handler'
+import mongoose from 'mongoose'
 import Post from '../../models/Post.js'
 import User from '../../models/User.js'
 import Comment from '../../models/Comment.js'
@@ -9,6 +10,27 @@ import Comment from '../../models/Comment.js'
 // @private
 //This is the controller function that is responsible for providing the required data of the insittuion 
 //to the frontend
+
+
+const getUserPost = handleAsync(async (req, res) => {
+
+    const username = req.query.username
+    const user_id = await User.findOne({username: username}).select().lean();
+    const posts = await Post.find({user_id: user_id._id}).select({_id:1, post: 1, tag: 1,date:1}).lean()
+    if(req.query.id){
+        const id = new mongoose.Types.ObjectId(req.query.id)
+        const criteria = {_id: id}
+        const values = { 
+            post: req.query.post,
+            tag: req.query.tag,
+        }
+        const update = await Post.findOneAndUpdate(criteria, values, {
+            new: true
+        })
+
+    }
+    return res.json(posts)
+})
 
 const getPostList = handleAsync(async (req, res) => {
 
@@ -95,9 +117,11 @@ const createPost = handleAsync(async (req, res) => {
     }
 
     if(params.posting){
-        const user = await User.findOne({username: "Kirito"}).select('_id').lean()
-        const post = await Post.create({'post': params.post, 'user_id': user, 'tag': params.tag})
-        res.status(200).json("Post created")
+        if(params.tag !== '' && params.tag && params.post && params.post !== ''){
+            const user = await User.findOne({username: "Kirito"}).select('_id').lean()
+            const post = await Post.create({'post': params.post, 'user_id': user, 'tag': params.tag})
+            res.status(200).json("Post created")
+        } 
     }
 })
 
@@ -113,7 +137,12 @@ const updatePost = handleAsync(async (req, res) => {
 // @route DElETE/Post
 // @private
 const deletePost = handleAsync(async (req, res) => {
-
+    const id = req.query.deleteVal;
+    if(id && id !== ''){
+        const data = new mongoose.Types.ObjectId(id)
+        const deleteData = await Post.deleteOne({_id: data});
+        return res.json(deleteData)
+    }
 })
 
-export default { getPostList, createPost, updatePost, deletePost};
+export default { getPostList, createPost, updatePost, deletePost, getUserPost,};

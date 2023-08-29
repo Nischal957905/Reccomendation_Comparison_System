@@ -328,9 +328,13 @@ export default function InstitutionList(){
     return (
         <div className="layout">
             <div className="left-div">
-                    <Search 
+                    {
+                        isSuccess &&
+                        <Search 
                         iterable={eachInstitutionName}
+                        category= "institution"
                     />
+                    }
                 <div>
                     <div className="filter-options">
                         <div className="filter-con">
