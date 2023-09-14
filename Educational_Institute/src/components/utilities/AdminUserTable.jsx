@@ -21,7 +21,15 @@ export default function AdminUserTable({props, deletion}) {
             <Table sx={{ minWidth: 400 }} size="small" aria-label="a dense table">
                 <TableHead>
                     <TableRow>
+                        <TableCell>Users</TableCell>
                         <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        <TableCell></TableCell>
+                        
+                        <TableCell></TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>Posts</TableCell>
                         <TableCell>Id</TableCell>
                         <TableCell>Username</TableCell>
                         <TableCell>Status</TableCell>

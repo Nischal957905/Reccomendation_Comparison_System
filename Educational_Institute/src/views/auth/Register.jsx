@@ -9,6 +9,7 @@ export default function Register(){
         location: false
     })
     const [delayedData, setDelayedData] = useState({})
+    const [dataError, setDataError] = useState(false)
 
     const navigate = useNavigate()
 
@@ -19,15 +20,24 @@ export default function Register(){
 
     useEffect(() => {
         if(data && isSuccess){
-            localStorage.setItem('username', data.username)
-            localStorage.setItem('login',true)
-            localStorage.setItem('role', "non-admin")
-            navigate('/')
+            if(data === "user found"){
+                setDataError(true)
+            }
+            else{
+                setDataError(false)
+                localStorage.setItem('username', data.username)
+                localStorage.setItem('login',true)
+                localStorage.setItem('role', "non-admin")
+                navigate('/')
+            }
         }
     },[data])
  
     const handleFormDataChange = (event) => {
         const {name, value} = event.target
+        if(dataError === true){
+            setDataError(false)
+        }
         setFormData((prevVal) => {
             return{
                 ...prevVal,
@@ -73,52 +83,71 @@ export default function Register(){
         })
     }
 
-
     return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>Username</label>
-                    <input 
-                        name="username"
-                        type="text"
-                        required
-                        value={formData.username}
-                        onChange={handleFormDataChange}
-                    />
-                </div>
-                <div>
-                    <label>Password</label>
-                    <input 
-                        name="password"
-                        type="password"
-                        required
-                        value={formData.password}
-                        onChange={handleFormDataChange}
-                    />
-                </div>
-                <div>
-                    <label>Email</label>
-                    <input 
-                        name="email"
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={handleFormDataChange}
-                    />
-                </div>
-                <div>
-                    <label>Location</label>
-                    <input 
-                        name="location"
-                        type="checkbox"
-                        required
-                        checked={formData.location}
-                        onChange={handleLocationConfirm}
-                    />
-                </div>
-                <button>Register</button>
-            </form>
+            <div className="logost">
+                <img src='/logo.png'></img>
+            </div>
+            <div className="form-parent">
+                <form onSubmit={handleSubmit}>
+                    <div className="header-pp">
+                    🆂🅸🅶🅽🆄🅿 🅸🅽🆃🅾 🅲🅾🅽🆂🆄🅻🆃🅼🅴
+                    </div>
+                    <div className="login-username">
+                        <input 
+                            name="username"
+                            type="text"
+                            required
+                            value={formData.username}
+                            placeholder="Username"
+                            onChange={handleFormDataChange}
+                        />
+                    </div>
+                    <div className="login-pass">
+                        <input 
+                            name="password"
+                            type="password"
+                            required
+                            value={formData.password}
+                            placeholder="Password"
+                            onChange={handleFormDataChange}
+                        />
+                    </div>
+                    <div className="login-email">
+                        <input 
+                            name="email"
+                            type="email"
+                            required
+                            value={formData.email}
+                            onChange={handleFormDataChange}
+                            placeholder="Email"
+                        />
+                    </div>
+                    <div className="pivot-box">
+                        <input 
+                            name="location"
+                            type="checkbox"
+                            required
+                            checked={formData.location}
+                            onChange={handleLocationConfirm}
+                        />
+                        <label>Location</label>
+                    </div>
+                    {
+                        dataError && 
+                        <div className="login-error">
+                            <p>User with this username exists</p>
+                        </div>
+                    }
+                    <div className="format-btn">
+                        <button type="submit">Sign up</button>
+                    </div>
+                    <div className="format-signup">
+                        Already have an account?<p><a href="/auth/login">Login</a></p>
+                    </div>
+                </form>
+            </div>
+            
         </div>
     )
 }

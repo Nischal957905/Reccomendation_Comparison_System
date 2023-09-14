@@ -15,6 +15,13 @@ export const adminSlice = createApi({
               params: details,
             })
         }),
+        createNewCollege: builder.mutation({
+          query: (details) => ({
+            url: '/admin/new/college',
+            method: "POST",
+            body: details,
+          })
+        }),
         postSchoolNew: builder.query({
             query: (details) => ({
               url: '/admin/new/school',
@@ -100,5 +107,6 @@ export const {
     useEditPostSchoolQuery,
     useGetUserListQuery,
     useEditPostUserQuery,
-    useInactivateUserQuery
+    useInactivateUserQuery,
+    useCreateNewCollegeMutation
 } = adminSlice

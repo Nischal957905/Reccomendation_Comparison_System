@@ -3,6 +3,7 @@ These are the imports that are required in the development of the system.
 Various inclusion of imports containing react-icon imoprts as well as differet state imports exist
 */
 import Paginate from "../../components/pagination/Paginate";
+import LinearProgress from '@mui/material/LinearProgress';
 
 import { useGetInstitutionsQuery, useGetInstitutionsOnFilterQuery, useGetInstitutionsOnAdditionalFilterQuery } from "../../app/api/appSlice"
 import { appSlice } from "../../app/api/appSlice"
@@ -259,13 +260,14 @@ export default function InstitutionList(){
     const institutionName = Array.isArray(institutions)
         ? displayedData.map((institution, index) => {
             const imagesDirectory = `/images/${institution.name.replace(/ /g, "_")}`;
+            const name = institution.name.length > 25 ? institution.name.substring(0,25) + '...' : institution.name
             return (
                 <div key={index} className="child-items">
                     <div key={index} className="img-holder">
                         <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
                     </div>
                     <div className="name-holder">
-                        {institution.name}
+                        <p className="name-styler">{name}</p>
                         <Link to={`/institution/${institution.name}`}>
                             <GrFormNextLink className="link-institution"/>
                         </Link>
@@ -326,6 +328,11 @@ export default function InstitutionList(){
 
     //This is the return statement for the page and actually renders whatever is inside it.
     return (
+        <div>
+            {
+                isLoading &&
+                <LinearProgress />
+            }
         <div className="layout">
             <div className="left-div">
                     {
@@ -384,13 +391,15 @@ export default function InstitutionList(){
                 <div className="top-rated">
                     { rankingInstitution}
                 </div>
-                
+                <div className="pagination-style">
                 <Paginate
                     count = {totalPages}
                     update = {handlePageChange}
                     pageCurrently={currentPage}
                 />
+                </div>
             </div>
+        </div>
         </div>
     )
 }

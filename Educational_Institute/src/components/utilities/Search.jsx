@@ -4,6 +4,11 @@ import TextField from '@mui/material/TextField';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
+
+const customStyles = {
+    maxHeight: '20px', // Adjust this value as needed
+};
+
 export default function Search({iterable,category}){
 
     const [insitution, setInstitution] = useState()
@@ -29,7 +34,7 @@ export default function Search({iterable,category}){
     // )
 
     return (
-        <>
+        <div className='searchable'>
             <Autocomplete
                 disablePortal
                 id="search-completion"
@@ -38,14 +43,16 @@ export default function Search({iterable,category}){
                 value={insitution}
                 onChange={(event, newVal) => handleInsititutionSelection (event, newVal)}
                 renderInput={(params) => <div className='dsa'>
-                        <TextField {...params} label="Institution"/>
-                        
+                        <TextField {...params} label="Institution" className='search-text'
+                        size='small'
+                        />
                 </div>}
             />
-            <div className='dasdsa'>
+            <div className='search-btn-st'>
+                Search
                 <BiSearchAlt className="search-query" onClick={handleSearch}/>
             </div>
-        </>
+        </div>
     )
 
 }

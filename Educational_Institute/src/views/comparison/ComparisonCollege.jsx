@@ -1,9 +1,17 @@
 import { useGetComparisonCollegeQuery } from "../../app/api/comparisonSlice"
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import MessageProp from "../../components/utilities/MessageProp";
+import {LinearProgress} from "@mui/material";
+
+import Divider from '@mui/material/Divider';
+import Chip from '@mui/material/Chip';
+import IconButton from '@mui/material/IconButton';
+import CompareArrowsIcon from '@mui/icons-material/CompareArrows';
+import { Button } from "@mui/material";
+import AddIcon from '@mui/icons-material/Add';
 //Tabs
 import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
@@ -23,6 +31,7 @@ export default function ComparisonCollege() {
     const {
         data: institutionData,
         isSuccess,
+        isLoading,
         error
     } = useGetComparisonCollegeQuery(delayedValue)
 
@@ -77,6 +86,16 @@ export default function ComparisonCollege() {
         setMessagePop(true)
     }
 
+    const [nonSelected,setNonSelected] = useState(true)
+    useEffect(() => {
+        if(isSuccess && !institutionData?.scoreObject){
+            setNonSelected(true)
+        }
+        else if(isSuccess && institutionData?.scoreObject){
+            setNonSelected(false)
+        }
+    },[institutionData])
+
     const handleMessageType = (value, severity) => {
         setDisplay({
             message: value,
@@ -128,62 +147,188 @@ export default function ComparisonCollege() {
         return Object.values(val).every(item => item !== '' && item !== null);
     }
 
+    
+    const institutionsPop = [
+        {
+            item1: 'AITM College',
+            item2: 'Brixton College'
+
+        },
+        {
+            item1: 'NAMI College',
+            item2: 'Camad College'
+        }, 
+        {
+            item1: 'Modern Nepal College',
+            item2: 'Kathmandu Medical College'
+        },
+        {
+            item1: 'Ratna Rajya Laxmi Campus',
+            item2: 'Little Buddha College of Health Science'
+        } , 
+        {
+            item1: 'Mid-Valley International College',
+            item2: 'Saraswati Multiple Campus',
+        },
+        {
+            item1: "St. Xavier's College, Maitighar",
+            item2: 'Nepal Law Campus',
+        },
+        {
+            item1: 'The British College',
+            item2: 'Softwarica College of IT and E-commerce'
+        },
+        {
+            item1: 'United College',
+            item2: 'Trichandra Multiple Campus'
+        },
+        {
+            item1: 'Padma Kanya Multiple Campus',
+            item2: 'Padmashree College'
+        }
+    ]
+
+    const institutionName = [
+        {
+            item1: 'AITM College',
+            item2: 'Brixton College'
+
+        },
+        {
+            item1: 'NAMI College',
+            item2: 'Camad College'
+        }, 
+        {
+            item1: 'Modern Nepal',
+            item2: 'KMC'
+        },
+        {
+            item1: 'Ratna R Laxmi',
+            item2: 'Little Buddha'
+        } , 
+        {
+            item1: 'Mid-Valley',
+            item2: 'Saraswati',
+        },
+        {
+            item1: "St. Xavier's",
+            item2: 'Nepal Law',
+        },
+        {
+            item1: 'British',
+            item2: 'Softwarica'
+        },
+        {
+            item1: 'United College',
+            item2: 'Trichandra'
+        },
+        {
+            item1: 'Padma Kanya',
+            item2: 'Padmashree'
+        }
+    ]
+
+    const handlePopular = (values) => {
+        setSelectedInstitution({
+            1: values.item1,
+            2: values.item2
+        })
+        setDelayedValue({
+            1: values.item1,
+            2: values.item2
+        })
+    }
+
+    const popularCards = institutionsPop.map((item, index) => {
+        const imagesDirectory1 = `/images/${item.item1.replace(/ /g, "_")}`;
+        const imagesDirectory2 = `/images/${item.item2.replace(/ /g, "_")}`;
+        return (
+            <div key={index} className="each-item-pop">
+                <div className="card-img">
+                    <img src={`${imagesDirectory1}.jpg`} className="comaparable-img"></img>
+                    <p>{institutionName[index].item1}</p>
+                </div>
+                <div className="icons">
+                    <IconButton color="secondary" onClick={() => handlePopular(item)}><CompareArrowsIcon/></IconButton>
+                </div>
+                <div className="card-img">
+                    <img src={`${imagesDirectory2}.jpg`} className="comaparable-img"></img>
+                    <p>{institutionName[index].item2}</p>
+                </div>
+            </div>
+        )
+    })
+
     return(
         <div>
+            {
+                isLoading &&
+                <LinearProgress />
+            }
             <MessageProp 
                 stateValue={messagePop}
                 destroy={destroyPopMessage}
                 messageType={display.severity}
                 message={display.message}
             />
-            <div>
-                <Autocomplete
-                    disablePortal
-                    id="auto-completion"
-                    className="select-comparison"
-                    options={institutionsName}
-                    value={selectedInstitution[1] || null}
-                    onChange={(event, newVal) => handleInsititutionSelection (event, newVal, 1)}
-                    renderInput={(params) => <TextField {...params} label="Institution"/>}
-                />
-            </div>
-            <div>
-                <Autocomplete
-                    disablePortal
-                    id="auto-completion"
-                    className="select-comparison"
-                    options={institutionsName}
-                    value={selectedInstitution[2] || null}
-                    onChange={(event, newVal) => handleInsititutionSelection (event, newVal, 2)}
-                    renderInput={(params) => <TextField {...params} label="Institution"/>}
-                />
-            </div>
-            {
-                count > 0 &&
-                [...Array(count)].map((item, index) => (
-                    <div key={index}>
+            <div className="main-auto">
+                <div className="add-controls">
+                    <Button color="secondary" variant="outlined" onClick={addComparison}><AddIcon/></Button>
+                </div>
+                <div className="auto-holder">
+                    <div className="first-auto">
+                        <Autocomplete
+                            disablePortal
+                            size="small"
+                            id="auto-completion"
+                            className="select-comparison"
+                            options={institutionsName}
+                            value={selectedInstitution[1] || null}
+                            onChange={(event, newVal) => handleInsititutionSelection (event, newVal, 1)}
+                            renderInput={(params) => <TextField {...params} label="Institution"/>}
+                        />
+                    </div>
+                    <div className="second-auto">
                         <Autocomplete
                             disablePortal
                             id="auto-completion"
                             className="select-comparison"
+                            size="small"
                             options={institutionsName}
-                            value={selectedInstitution[index + 3] || null}
-                            onChange={(event, newVal) => handleInsititutionSelection (event, newVal, index + 3)}
+                            value={selectedInstitution[2] || null}
+                            onChange={(event, newVal) => handleInsititutionSelection (event, newVal, 2)}
                             renderInput={(params) => <TextField {...params} label="Institution"/>}
                         />
                     </div>
-                ))
-            }
-            <button onClick={addComparison}>Add+</button>
-            <button onClick={handleClickCompare}>Compare</button>
-            
-            <div>
+                    {
+                        count > 0 &&
+                        [...Array(count)].map((item, index) => (
+                            <div key={index} className="third-auto">
+                                <Autocomplete
+                                    disablePortal
+                                    id="auto-completion"
+                                    size="small"
+                                    className="select-comparison"
+                                    options={institutionsName}
+                                    value={selectedInstitution[index + 3] || null}
+                                    onChange={(event, newVal) => handleInsititutionSelection (event, newVal, index + 3)}
+                                    renderInput={(params) => <TextField {...params} label="Institution"/>}
+                                />
+                            </div>
+                        ))
+                    }
+                </div>
+                <div className="auto-controls">
+                    <Button variant="contained" onClick={handleClickCompare}>Compare</Button>
+                </div>
+            </div>    
+            <div className="bar-container">
                 {
                     scoreObject &&
                 <Box>
                     <TabContext value={tabValue}>
                         <Box sx={{borderBottom:1, borderColor:"divider"}}>
-                            <TabList onChange={tabSwappingHandler}>
+                            <TabList onChange={tabSwappingHandler} centered>
                                 <Tab value="1" label="Experience"/>
                                 <Tab value="2" label="Accessibility"/>
                                 <Tab value="3" label="Rating"/>
@@ -191,77 +336,105 @@ export default function ComparisonCollege() {
                             </TabList>
                         </Box>
                         <TabPanel value="1">
-                            <BarChart
-                                xAxis={[
-                                    {
-                                        id: 'barCategories',
-                                        data: label,
-                                        scaleType: 'band',
-                                    }
-                                ]}
-                                series={[
-                                    {
-                                        data: experienceArray
-                                    }
-                                ]}
-                                height={400}
-                            />
+                            <div className="barchart-design">
+                                <BarChart
+                                    xAxis={[
+                                        {
+                                            id: 'barCategories',
+                                            data: label,
+                                            scaleType: 'band',
+                                            label: 'Experience Points'
+                                        }
+                                    ]}
+                                    series={[
+                                        {
+                                            data: experienceArray
+                                        }
+                                    ]}
+                                    height={400}
+                                    width={800}
+                                />
+                            </div>
                         </TabPanel>
                         <TabPanel value="2">
-                            <BarChart
-                                xAxis={[
-                                    {
-                                        id: 'accessCategory',
-                                        data: label,
-                                        scaleType: 'band',
-                                    }
-                                ]}
-                                series={[
-                                    {
-                                        data: accessArray
-                                    }
-                                ]}
-                                height={400}
-                            />
+                            <div className="barchart-design">
+                                <BarChart
+                                    xAxis={[
+                                        {
+                                            id: 'accessCategory',
+                                            data: label,
+                                            scaleType: 'band',
+                                            label: 'Access Points'
+                                        }
+                                    ]}
+                                    series={[
+                                        {
+                                            data: accessArray
+                                        }
+                                    ]}
+                                    height={400}
+                                    width={800}
+                                />
+                            </div>
                         </TabPanel>
                         <TabPanel value="3">
-                            <BarChart
-                                xAxis={[
-                                    {
-                                        id: 'ratingCategories',
-                                        data: label,
-                                        scaleType: 'band',
-                                    }
-                                ]}
-                                series={[
-                                    {
-                                        data: ratingArray
-                                    }
-                                ]}
-                                height={400}
-                            />
+                            <div className="barchart-design">
+                                <BarChart
+                                    xAxis={[
+                                        {
+                                            id: 'ratingCategories',
+                                            data: label,
+                                            scaleType: 'band',
+                                            label: 'Rating Points'
+                                        }
+                                    ]}
+                                    series={[
+                                        {
+                                            data: ratingArray
+                                        }
+                                    ]}
+                                    height={400}
+                                    width={800}
+                                />
+                            </div>
                         </TabPanel>
                         <TabPanel value="4">
-                            <BarChart
-                                xAxis={[
-                                    {
-                                        id: 'totalCategory',
-                                        data: label,
-                                        scaleType: 'band',
-                                    }
-                                ]}
-                                series={[
-                                    {
-                                        data: totalArray
-                                    }
-                                ]}
-                                height={400}
-                            />
+                            <div className="barchart-design">
+                                <BarChart
+                                    xAxis={[
+                                        {
+                                            id: 'totalCategory',
+                                            data: label,
+                                            scaleType: 'band',
+                                            label: 'Total Points'
+                                        }
+                                    ]}
+                                    series={[
+                                        {
+                                            data: totalArray
+                                        }
+                                    ]}
+                                    height={400}
+                                    width={800}
+                                />
+                            </div>
                         </TabPanel> 
                     </TabContext>
                 </Box>
                 }
             </div>
+            {
+                nonSelected && (
+                    <div>
+                        <Divider variant="middle">
+                            <Chip  color="primary" label={"Popular Comparisons"}/>
+                        </Divider>
+                        <div className="popular-cards">
+                            {popularCards}
+                        </div>
+                    </div>
+                )
+            }
             {
                 
                 scoreObject &&
@@ -271,18 +444,28 @@ export default function ComparisonCollege() {
                             const imagesDirectory = `/images/${item.institution.name.replace(/ /g, "_")}`;
                             return(
                                 <div className="comparable-items" key={index}>
-                                    <div>
+                                    <Divider variant="middle">
+                                        <Chip label={item.institution.name}/>
+                                    </Divider>
+                                    <div className="comp-img">
                                         <img src={`${imagesDirectory}.jpg`} className="comaparable-img"></img>
                                     </div>
                                     <div className="totalPoints">
-                                        <div>
-                                            Total point: {item.access + item.experience}
+                                        <div className="Service-comp">
+                                            <div className="des-comp">
+                                                Accesibility score: {item.access  !== null ? item.access : 0}
+                                            </div>
+                                            <div className="des-comp">
+                                                Experience score: {item.experience  !== null ? item.experience : 0}
+                                            </div>
                                         </div>
-                                        <div>
-                                            Experience score: {item.experience  !== null ? item.experience : 0}
-                                        </div>
-                                        <div>
-                                            Accesibility score: {item.access  !== null ? item.access : 0}
+                                        <div className="total-comp">
+                                            <div className="des-comp">
+                                                Total points: {item.review+ item.access + item.experience}
+                                            </div>
+                                            <div className="des-comp">
+                                                Rating score: {item.review}
+                                            </div>
                                         </div>
                                     </div>
                                     <div className="features-comparison">
@@ -318,7 +501,7 @@ export default function ComparisonCollege() {
                                                 }
                                             </ul>
                                         </div>
-                                        <div>
+                                        <div className="cons-div">
                                             <h3>Cons</h3>
                                             <ul>
                                                 {!item.institution.online && 

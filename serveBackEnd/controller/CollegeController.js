@@ -10,6 +10,13 @@ const getSingleCollege = handleAsync(async (req, res) => {
         if(college){
             const institutionData = await College.findOne({name: college}).lean()
 
+            const totalRating = await Review.find({institution_code: institutionData._id}).select().lean()
+            let totalRate = 0;
+            totalRating.forEach(element => {
+                totalRate += element.rating;
+            });
+            const finalRating = totalRate / totalRating.length;
+
             const positiveReview = await Review.find({
                 institution_code: institutionData._id,
                 rating_classification: "Positive"
@@ -21,7 +28,7 @@ const getSingleCollege = handleAsync(async (req, res) => {
             }).select().lean().limit(5)
 
 
-            return res.json({institutionData, positiveReview, negativeReview})
+            return res.json({institutionData, positiveReview, negativeReview, finalRating})
         }
         else{
             return res.status(404).json({error: 'Page not Found'});
@@ -36,6 +43,8 @@ const parseTimeString = timeString => {
     const hours = parseInt(parts[0]);
     const minutes = parts.length > 1 ? parseInt(parts[1]) : 0;
     const date = new Date(2000, 1, 2, hours, minutes);
+    console.log(date)
+    console.log(timeString)
     return date;
 };
 
@@ -189,4 +198,5 @@ const getCollegeList = handleAsync(async (req, res) => {
     return res.json({colleges, additionalStatus})
 })
 
-export default { getSingleCollege, getCollegeList};
+export default { getSingleCollege, getCollegeList, parseTimeString,
+applyRangeFilter, applyTimeFilter, applyDistanceFilter, applyQuickFilter, applyFilter};

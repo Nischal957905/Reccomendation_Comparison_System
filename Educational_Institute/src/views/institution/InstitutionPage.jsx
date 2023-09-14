@@ -1,9 +1,15 @@
-import  { useParams } from 'react-router-dom'
+import  { useNavigate, useParams } from 'react-router-dom'
 import { useGetSingleInstitutionQuery, usePostReviewQuery } from "../../app/api/appSlice"
 import GoogleMap from '../../components/utilities/GoogleMap';
 import { useState, useEffect } from 'react';
 import Rating from "@mui/material/Rating";
 import useAuthentication from '../../components/hooks/useAuthentication';
+import SchoolIcon from '@mui/icons-material/School';
+import TravelExploreIcon from '@mui/icons-material/TravelExplore';
+import EmojiPeopleIcon from '@mui/icons-material/EmojiPeople';
+import { Button, Divider, TextField } from '@mui/material';
+import LinearProgress from '@mui/material/LinearProgress';
+import MessageProp from '../../components/utilities/MessageProp';
 
 export default function InstitutionPage() {
 
@@ -26,6 +32,14 @@ export default function InstitutionPage() {
         'review': '',
         'institution': null
     })
+
+    const navigation = useNavigate()
+
+    useEffect(() => {
+        if(error){
+            navigation('/error')
+        }
+    },[error])
 
     useEffect(() => {
         if(isSuccess){
@@ -100,6 +114,8 @@ export default function InstitutionPage() {
         event.preventDefault()
         if(reviewData.review && reviewData.review !== ''){
             setDelayedData(reviewData)
+            handleMessageType('Successfully Provided your review', 'success')
+            showPopMessage()
         }
     }
 
@@ -160,35 +176,125 @@ export default function InstitutionPage() {
         featureArray = data && renderFeatureClasses();
     }
 
+    const imageUrl = '../images/Australia.jpg';
+
+    const divStyle = {
+        backgroundImage: `url(${imageUrl})`,
+        width: '100%',
+        height: '100%'
+    };
+
+    const [messagePop, setMessagePop] = useState(false)
+    const [display, setDisplay] = useState({
+        message: '',
+        severity: '',
+    })
+    const destroyPopMessage = (event,reason) => {
+        if(reason === 'clickaway'){
+            return;
+        }
+        setMessagePop(false)
+    }
+
+    const showPopMessage = () => {
+        setMessagePop(true)
+    }
+
+    const handleMessageType = (value, severity) => {
+        setDisplay({
+            message: value,
+            severity: severity
+        })
+    }
+
     return(
         <div>
-            <div>
-                <div className='img-back-logo-holder'>
-                    { imagesDirectory && <img src={`${imagesDirectory}.jpg`} className="back-logo-img"></img>}
-                </div>
-                <div className='fields-holder'>
-                    <div>
-                        countries: {data && data.institutionData.countries.length}
+            <MessageProp 
+                stateValue={messagePop}
+                destroy={destroyPopMessage}
+                messageType={display.severity}
+                message={display.message}
+            />
+            <div className='basic-info' style={{
+                backgroundImage: `url(${imageUrl})`
+            }}>
+                {   data && data.finalRating &&
+                    <div className='rating-in'>
+                        <div>
+                            <Rating
+                                precision={0.5}
+                                value={data.finalRating}
+                                readOnly
+                            />
+                        </div>
                     </div>
-                    <div>
-                        universities: {data && data.institutionData.universities !== '' ? data.institutionData.universities : "Not shown" }    
+                }
+                <div className='designers'>
+                    <div className='img-back-logo-holder'>
+                        <div>
+                        { imagesDirectory && <img src={`${imagesDirectory}.jpg`} className="back-logo-img"></img>}
+                        </div>
                     </div>
-                    <div>
-                        experience: {data && data.institutionData.experience !== '' ? data.institutionData.experience : "Now shown"}    
-                    </div>
-                    <div>
-                        success: {data && data.institutionData.success !== '' ? data.institutionData.success : "Not Shown"}    
+                    <div className='fields-holder'>
+                        <div>
+                            <div className='popls'>{data && data.institutionData.countries.length}</div>
+                            <div className='popl'>COUNTRY</div>
+                        </div>
+                        <div>
+                            <div className='popls'>{data && data.institutionData.universities !== '' ? data.institutionData.universities : "n.s" }  </div>
+                            <div className='popl'>UNIVERISTY</div>
+                        </div>
+                        <div>
+                            <div className='popls'>{data && data.institutionData.experience !== '' ? data.institutionData.experience : "n.s"}    </div>
+                            <div className='popl'>EXPERIENCE</div>
+                        </div>
+                        <div>
+                            <div className='popls'>{data && data.institutionData.success !== '' ? data.institutionData.success : "n.s"}   </div>
+                            <div className='popl'>SUCCESS</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div>
-                <div>
-                    <div>About</div>
-                    {renderNegativeReview}
-                    {renderPositiveReview}
+            <div className='detail-info'>
+                <div className='div-ab'>
+                    <div className='divv-abb'>About</div>
+                    {
+                        data && data.institutionData.name &&
+                        (
+                            <div className='abb-con'>
+                                {data.institutionData.name} has been in the service for
+                                {data.institutionData.experience || " many "} years. During its service period it 
+                                has been continously providing its wide range of services. {data.institutionData.countries.length > 1 
+                                ? "It has been providing its unique and needy services for multiple countries accross the world" :
+                                "It has been providing its needy services exceling in a particular country. "}{data.institutionData.address &&
+                                `It is located at the heart of nepal right at ${data.institutionData.address}. `}
+                            </div>
+                        )
+                    }
+                    <Divider/>
+                    {
+                        data && data.institutionData.phone &&
+                        (
+                            <div className='phooone'>
+                                <div>
+                                    <div className='hd'>Phone</div>
+                                    <div className='ddd'>{data.institutionData.phone}</div>
+                                </div>
+                                <div>
+                                    <div className='hd'>Opening Time</div>
+                                    <div className='ddd'>{data.institutionData.opening_time}</div>
+                                </div>
+                                <div>
+                                    <div className='hd'>Closing Time</div>
+                                    <div className='ddd'>{data.institutionData.closing_time}</div>
+                                </div>
+                            </div>
+                        )
+                    }
+                    <Divider/>
                 </div>
                 <div className='feature-holder-in'>
-                    <h3>Features</h3>
+                    <h3 className='divv-abb'>Features</h3>
                     <ul>
                         {
                             data && data.institutionData.countries.length > 0 ? (
@@ -212,72 +318,107 @@ export default function InstitutionPage() {
                             featureArray && 
                             <li>It provides different classes like {featureArray.join(', ')} etc.</li>
                         }
-
                     </ul>
+                    <Divider />
                 </div>
             </div>
-            {
-                data && data?.institutionData.latitude !== '' && data?.institutionData.latitude &&
-                <GoogleMap 
-                    lat={data.institutionData.latitude}
-                    long = {data.institutionData.longitude}
-                />
-            }
-            <div className='post-review'>
-                <form onSubmit={handleOnSubmit}>
-                    <div className='review'>
-                        <label>Review</label>
-                        <input
-                            name='review'
-                            value={reviewData.review}
-                            type='text'
-                            onChange={handleOnChange}
+            <div className='review-category'>
+                <div className='review-positives'>
+                    {
+                        data && data?.positiveReview.length > 0 && <div className='divv-abb plop'>Postive Reviews</div> }
+                    {
+                        data && data?.positiveReview.length > 0 &&
+                        data.positiveReview.map((item,index) => {
+                            return(
+                                <div key={index} className='dbs'>
+                                    <Divider />
+                                    <div className='dsop'>
+                                        <Rating
+                                            precision={0.5}
+                                            value={item.rating}
+                                            readOnly
+                                            size='small'
+                                        />
+                                    </div>
+                                    <p className='dopp'>{item.review}</p>
+                                    <p className='us-dbs'>{item.username}</p>
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+                <div className='review-negatives'>
+                    {
+                        data && data?.negativeReview.length > 0 && <div className='divv-abb slop'>Negative Reviews</div> }
+                    {
+                        data && data?.negativeReview.length > 0 &&
+                        data.negativeReview.map((item,index) => {
+                            return(
+                                <div key={index} className='dbs'>
+                                    <Divider />
+                                    <div className='dsop'>
+                                        <Rating
+                                            precision={0.5}
+                                            value={item.rating}
+                                            readOnly
+                                            size='small'
+                                        />
+                                    </div>
+                                    <p className='dopp'>{item.review}</p>
+                                    <p className='us-dbs'>{item.username}</p> 
+                                </div>
+                            )
+                        })
+                    }
+                </div>
+            </div>
+            <div className='review-map'>
+                <div className='post-review'>
+                    <form onSubmit={handleOnSubmit}>
+                        <div className='rating'>
+                            <Rating
+                                precision={0.5}
+                                name='rating'
+                                value={reviewData.rating}
+                                onChange={ratingHandleChange}
+                                sx={{
+                                    '& .MuiRating-iconEmpty': {
+                                      color: 'white',
+                                    }
+                                }}
+                            />
+                        </div>
+                        <div className='review'>
+                            <TextField
+                                name='review'
+                                value={reviewData.review}
+                                type='text'
+                                onChange={handleOnChange}
+                                label="Review"
+                                color='primary'
+                                multiline
+                                variant='standard'
+                                fullWidth   
+                                required                        
+                            />
+                        </div>
+                        <div className='dsabd'>
+                            <Button variant='outlined' type='submit'>Submit Review</Button>
+                        </div>
+                    </form> 
+                </div>
+                <div className='map-holder'>
+                    {
+                    data && data?.institutionData.latitude !== '' && data?.institutionData.latitude &&
+                    <div className='mapper'>
+                        <GoogleMap 
+                            lat={data.institutionData.latitude}
+                            long = {data.institutionData.longitude}
                         />
                     </div>
-                    <div className='rating'>
-                        <Rating
-                            precision={0.5}
-                            name='rating'
-                            value={reviewData.rating}
-                            onChange={ratingHandleChange}
-                        />
-                    </div>
-                    <button>Submit Review</button>
-                </form> 
+                    }
+                </div>
             </div>
-            <div>
-                {
-                    data && data?.positiveReview.length > 0 && <h1>Postive Reviews</h1> }
-                {
-                    data && data?.positiveReview.length > 0 &&
-                    data.positiveReview.map((item,index) => {
-                        return(
-                            <div key={index}>
-                                <p>{item.review}</p>
-                                <p>By {item.username}</p>
-                                <p>{item.rating} star</p>
-                            </div>
-                        )
-                    })
-                }
-            </div>
-            <div>
-                {
-                    data && data?.negativeReview.length > 0 && <h1>Negative Reviews</h1> }
-                {
-                    data && data?.negativeReview.length > 0 &&
-                    data.negativeReview.map((item,index) => {
-                        return(
-                            <div key={index}>
-                                <p>{item.review}</p>
-                                <p>By {item.username}</p>
-                                <p>{item.rating} star</p>
-                            </div>
-                        )
-                    })
-                }
-            </div>
-
         </div>
     )
 }

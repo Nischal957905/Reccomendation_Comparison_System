@@ -35,7 +35,7 @@ export default function User(){
     }, [loading])
 
     return(
-        <div>
+        <div className='body-tab'>
             {
                 isSuccess && 
                 <AdminUserTable

@@ -1,21 +1,29 @@
 import PostsTable from "../../../components/utilities/PostsTable"
 import { useEditPostUserQuery } from '../../../app/api/adminSlice'
-import { useParams } from "react-router-dom";
-import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 export default function UserPost(){
 
 
     const {institution} = useParams()
     const [delayedData, setDelayedData] = useState()
+    const navigation = useNavigate()
 
     const {
         data,
-        isSuccess
+        isSuccess,
+        isError
     } = useEditPostUserQuery({institution,delayedData})
+    
+    useEffect(() => {
+        if(isError){
+            navigation('/error')
+        }
+    },[isError])
 
     return (
-        <div>
+        <div className="body-tab">
             {
                 isSuccess &&
                 <PostsTable

@@ -17,11 +17,13 @@ import routeDiscussion from "./routes/discussion.js"
 import dbConnection from './config/dbConnection.js'
 import { logger, eventLogs } from './middleware/logger.js'
 import core from './config/continuousOperatingReference.js'
+import bodyParser from "body-parser"
 
 //Configuration on dot env file for setting up a environment for database.
 dotenv.config();
 
 const app = express()
+app.use(bodyParser.urlencoded({ extended: true,parse: true }));
 app.use(logger) //function for logging web app log into the logs directories
 app.use(cors(core)) //implementation of cors policy to block or allow access
 app.use(express.static('public')) //declaration of entrypoint directoyr file

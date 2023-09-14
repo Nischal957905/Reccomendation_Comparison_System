@@ -3,7 +3,7 @@ import { Route , Routes, BrowserRouter} from "react-router-dom";
 import PublicLayout from './layouts/PublicLayout'
 import PrivateLaout from './layouts/PrivateLayout'
 
-
+import Error from './views/Error'
 import Home from './views/Home'
 import InstitutionList from "./views/institution/InstitutionList";
 import Comparison from "./views/comparison/Comparison";
@@ -40,13 +40,12 @@ export default function App(){
   //this is the return statement that has bunch of routes defined and acts as the routing page for the app.
   return (
     <Routes>
-      <Route path="/" element= {<PublicLayout/>}>
-        <Route index element= { <Home/>}/>
-
-        <Route element={<LoginEnable />}>
+      <Route element={<LoginEnable />}>
           <Route path="/auth/login" element= {<Login />}/>
           <Route path="/auth/register" element={<Register/>} />
-        </Route>
+      </Route>
+      <Route path="/" element= {<PublicLayout/>}>
+        <Route index element= { <Home/>}/>
         <Route element={<AuthenticationEnable/>}>
 
           <Route path="/school" element={<SchoolList />} />
@@ -78,6 +77,7 @@ export default function App(){
           </Route>
         </Route>
       </Route>
+      <Route path="/*" element={<Error/>}></Route>
     </Routes>
   )
 }

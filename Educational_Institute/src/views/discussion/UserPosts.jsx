@@ -4,6 +4,11 @@ import IconButton from '@mui/material/IconButton';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteSweepIcon from '@mui/icons-material/DeleteSweep';
 import { useEffect, useState } from "react";
+import { Divider } from '@mui/material';
+import {LinearProgress} from '@mui/material'
+import MessageProp from '../../components/utilities/MessageProp';
+import DeleteConfirm from '../../components/form/DeleteConfirm';
+
 
 export default function UserPosts(){
 
@@ -15,6 +20,8 @@ export default function UserPosts(){
     })
 
     const [formState, setFormState] = useState(false)
+    const [deleteState, setDeleteState] = useState(false)
+    const [delayedDeleteValue, setDelayedDeleteValue] = useState({})
 
     const [delayedData, setDelayedData] = useState({
         'username': username,
@@ -25,6 +32,7 @@ export default function UserPosts(){
     const {
         data,
         isSuccess,
+        isLoading,
         refetch
     } = usePostUserDiscussionsQuery(delayedData)
 
@@ -42,6 +50,8 @@ export default function UserPosts(){
         setFormState(false)
         if(formData.post !== '' && formData.tag !== ''){
             setDelayedData(formData)
+            handleMessageType('changes saved', 'success')
+            showPopMessage()
         }
     }
 
@@ -66,17 +76,26 @@ export default function UserPosts(){
     }
 
     const closePopUp = () => {
-        setFormData({
-            'username': username
-        })
+        setDelayedDeleteValue({})
         setFormState(false)
+    }
+
+    const closeDeletePopUp = () => {
+        setDeleteState(false)
     }
     
     const deletePost = (values) => {
-        console.log(values)
-        setDeleteValue({
+        setDeleteState(true)
+        setDelayedDeleteValue({
             'deleteVal': values
         })
+    }
+
+    const deletionConfirmation = () => {
+        setDeleteValue(delayedDeleteValue)
+        setDeleteState(false)
+        handleMessageType('deleted', 'success')
+        showPopMessage()
     }
 
     useEffect(() => {
@@ -85,22 +104,86 @@ export default function UserPosts(){
         }
     },[isData])
 
+    const dateFormat = (date) =>{
+        const tos = date
+        if(date){
+            const val = tos.substr(0, 10).split("-");
+            return val[2] + "/" + val[1] + "/" + val[0];
+        }
+    }
+
+    const [messagePop, setMessagePop] = useState(false)
+    const [display, setDisplay] = useState({
+        message: '',
+        severity: '',
+    })
+    const destroyPopMessage = (event,reason) => {
+        if(reason === 'clickaway'){
+            return;
+        }
+        setMessagePop(false)
+    }
+
+    const showPopMessage = () => {
+        setMessagePop(true)
+    }
+
+    const handleMessageType = (value, severity) => {
+        setDisplay({
+            message: value,
+            severity: severity
+        })
+    }
+
     return(
-        <div>
+        <>
+        {
+            isLoading &&
+            <LinearProgress/>
+        }
+        <MessageProp 
+            stateValue={messagePop}
+            destroy={destroyPopMessage}
+            messageType={display.severity}
+            message={display.message}
+        />
+        <div className='user-dis-parent'>
+            <div className='create-post-div'>
+                <div className='create-section'>
+                    <p>
+                        🆄🆂🅴🆁 🅿🅾🆂🆃🆂
+                    </p>
+                </div>
+                <div className='post-btn'>
+                    <button disabled>your posts</button>
+                    <button><a href='/discussion'>Posts</a></button>
+                </div>
+                <Divider/>
+            </div>
+            <div className='post-section'>
             {
                 isSuccess &&
                 data.map((item) => {
+                    const date = dateFormat(item.date)
                     return (
-                        <div key={item._id}>
-                            <div>{item.tag}</div>
-                            <div>{item.post}</div>
-                            <div>--------------</div>
-                            <IconButton color='primary' onClick={() => handlePopUpForm(item)}><EditIcon/></IconButton>
-                            <IconButton color='secondary' onClick={() => deletePost(item._id)}><DeleteSweepIcon/></IconButton>
+                        <div key={item._id} className='each-div-user'>
+                            <div className='user-tag'>
+                                <div className='tag-divv'>Tag: {item.tag}</div>
+                                <div className='icons-user'>
+                                    <IconButton color='primary' onClick={() => handlePopUpForm(item)}><EditIcon/></IconButton>
+                                    <IconButton color='secondary' onClick={() => deletePost(item._id)}><DeleteSweepIcon/></IconButton>
+                                </div>
+                                </div>
+                            <div className='date-fo-hold'>
+                                <p>{date}</p>
+                                
+                            </div>
+                            <div className='hold-user-post'>{item.post}</div>
                         </div>
                     )
                 })
             }
+            </div>
             <PopUpForm 
                 formPopStatus={formState}
                 formSubmit={formHandler}
@@ -108,6 +191,12 @@ export default function UserPosts(){
                 formValue={formData}
                 closeForm={closePopUp}
             />
+            <DeleteConfirm
+                closeForm={closeDeletePopUp}
+                formPopStatus={deleteState}
+                formSubmit={deletionConfirmation}
+            />
         </div>
+        </>
     )
 }

@@ -1,11 +1,16 @@
-//necessary imports of epress
+/*
+This file consists of different route per specific page. These routes will be utilized as a rest
+api to connect mongo with fron-end react
+*/
+
+//necessary imports of epress modules and libraires including other custom made files
 import express from 'express'
 import institutionController from '../controller/InstitutionController.js'
 
-//initializeing an express router
+//Initilization of express router modules to gain access to router
 const modemRoute = express.Router();
 
-//defining base route and different routes for the different methods exsiting in the controller.
+//Declaration of the routes for this specific page pointing towards a method present in the controller
 modemRoute.route('/')
     .get(institutionController.getInstitutionList)
     .post(institutionController.createInstitution)

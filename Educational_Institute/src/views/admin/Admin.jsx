@@ -1,6 +1,7 @@
 import { useGetAdminShowListQuery, useDeletePostAdminQuery } from "../../app/api/adminSlice"
 import Paginate from "../../components/pagination/Paginate"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { LinearProgress } from "@mui/material";
 
 //Tabs
 import Box from '@mui/material/Box';
@@ -11,6 +12,7 @@ import TabPanel from '@mui/lab/TabPanel';
 
 //table
 import TableProp from "../../components/utilities/TableProp";
+import DeleteConfirm from '../../components/form/DeleteConfirm';
 
 export default function Admin() {
 
@@ -41,24 +43,55 @@ export default function Admin() {
     }
 
     const [deleteValue, setDeleteValue] = useState()
+    const [deleteState, setDeleteState] = useState(false)
+    const [delayedDeleteValue, setDelayedDeleteValue] = useState({})
 
     const {
         data: delData,
-        isSuccess: success
+        isSuccess: success,
+        isLoading
     } = useDeletePostAdminQuery(deleteValue)
 
     const handleDelete = (category, deletion) => {
-        setDeleteValue({
+        setDeleteState(true)
+        setDelayedDeleteValue({
             delete: deletion,
             category: category,
         })
+    }
+
+    useEffect(() => {
+        if(delData === "Deleted"){
+            refetch()
+        }
+    },[isLoading])
+
+    const deletionConfirmation = () => {
+        setDeleteValue(delayedDeleteValue)
         if(success){
             refetch()
         }
+        setDeleteState(false)
+        handleMessageType('deleted', 'success')
+        showPopMessage()
     }
+
+    const closeDeletePopUp = () => {
+        setDeleteState(false)
+    }
+    
 
     return (
         <div>
+            {
+                isloading &&
+                <LinearProgress />
+            }
+            <DeleteConfirm
+                closeForm={closeDeletePopUp}
+                formPopStatus={deleteState}
+                formSubmit={deletionConfirmation}
+            />
             <div>
                 <Box>
                     <TabContext value={tabValue}>
@@ -77,7 +110,7 @@ export default function Admin() {
                                         link='new/consultancy'
                                         deletion = {handleDelete}
                                         category = "consultancy"
-                                        editLink = "/admin/edit/consultancy/"
+                                        editLink = "/admin/edit/institution/"
                                     />
                                 ) : (
                                     <div>No data To show</div>
@@ -117,6 +150,7 @@ export default function Admin() {
                     </TabContext>
                 </Box>
             </div>
+            <div className="pagein">
             { isSuccess &&
                 <Paginate
                     count = {totalPage}
@@ -124,6 +158,7 @@ export default function Admin() {
                     pageCurrently={pageValue.page}
                 />
             }
+            </div>
         </div>
     )
 }

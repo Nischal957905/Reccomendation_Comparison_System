@@ -10,6 +10,13 @@ const getSingleSchool = handleAsync(async (req, res) => {
         if(college){
             const institutionData = await School.findOne({name: college}).lean()
 
+            const totalRating = await Review.find({institution_code: institutionData._id}).select().lean()
+            let totalRate = 0;
+            totalRating.forEach(element => {
+                totalRate += element.rating;
+            });
+            const finalRating = totalRate / totalRating.length;
+
             const positiveReview = await Review.find({
                 institution_code: institutionData._id,
                 rating_classification: "Positive"
@@ -21,7 +28,7 @@ const getSingleSchool = handleAsync(async (req, res) => {
             }).select().lean().limit(5)
 
 
-            return res.json({institutionData, positiveReview, negativeReview})
+            return res.json({institutionData, positiveReview, negativeReview, finalRating})
         }
         else{
             return res.status(404).json({error: 'Page not Found'});

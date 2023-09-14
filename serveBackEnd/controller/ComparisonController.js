@@ -113,7 +113,7 @@ const getComparison = handleAsync(async (req, res) => {
 
 const applyDistanceFilter = (useLat,useLong,lat,long) => {
 
-    if(lat !== '' && long !== ''){
+    if(lat !== '' && long !== '' && lat && long){
         let distanceOne = turf.point([useLat,useLong])
         let distanceTwo = turf.point([lat,long])
         let options = {units: 'metres'};

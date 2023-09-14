@@ -8,6 +8,8 @@ import Review from '../../models/Review.js'
 import Institution from '../../models/Institution.js'
 import User from '../../models/User.js'
 import Comment from '../../models/Comment.js'
+import fs from 'fs/promises';
+import path from 'path'
 
 const checkValues = (val) => {
     return Object.values(val).every(item => item !== '' && item !== null);
@@ -17,14 +19,17 @@ const deleteInstitution = handleAsync(async (req, res) => {
     if(req.query.delete !== '' && req.query.delete){
         const id = new mongoose.Types.ObjectId(req.query.delete)
         if(req.query.category === "consultancy"){
-            //const review = await Review.findOneAndRemove({institution_code: id});
-            //const data = await Institution.findByIdAndRemove({_id:id})
+            const review = await Review.findOneAndRemove({institution_code: id});
+            const data = await Institution.findByIdAndRemove({_id:id})
+            return res.json("Deleted")
         }
         else if(req.query.category === "college"){
-            //const data = await College.findByIdAndRemove({_id:id})
+            const data = await College.findByIdAndRemove({_id:id})
+            return res.json("Deleted")
         }
         else if(req.query.category === "school"){
-            //const data = await School.findByIdAndRemove({_id:id})
+            const data = await School.findByIdAndRemove({_id:id})
+            return res.json("Deleted")
         }
     }
 })
@@ -48,10 +53,14 @@ const getUserList = handleAsync(async (req,res) => {
 
 const editPost = handleAsync(async (req, res) => {
 
-    const institution = req.params.institution;
-    const data = await Post.find({user_id: institution}).select({date: 1, _id: 1, post: 1}).lean()
-
-    return res.json(data)
+    try {
+        const institution = req.params.institution;
+        const userVerify = await User.findOne({_id: institution}).select().lean();
+        const data = await Post.find({user_id: institution}).select({date: 1, _id: 1, post: 1}).lean()
+        return res.json(data)
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
 })
 
 const inactivateUser = handleAsync(async (req,res) => {
@@ -74,11 +83,12 @@ const inactivateUser = handleAsync(async (req,res) => {
 })
 
 const editCollege = handleAsync(async (req, res) => {
+    try{
     const institution = req.params.institution
     const params = req.query
     const edit = params.edit === 'true' ? true : false
     const id = new mongoose.Types.ObjectId(institution)
-    const initialArray = await College.findOne({_id: id}).select().lean();
+    let initialArray = await College.findOne({_id: id}).select().lean();
  
     if(edit && params.latitude !== "" && params.latitude
     && params.name !== "" && params.name && params.address !== "" && params.address
@@ -110,21 +120,29 @@ const editCollege = handleAsync(async (req, res) => {
             const updateInstitution = await College.findOneAndUpdate(findValue, updatedValues,{
                 new: true, 
             })
-            return res.json(updateInstitution)
+
+            const up = true;
+            initialArray = updateInstitution
+            return res.json({initialArray, up})
         }
         else{
-            return res.json(initialArray)
+            const down = true
+            return res.json({initialArray, down})
         }
         
     }
-    return res.json(initialArray)
+    return res.json({initialArray})
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
 })
 
 const editConsultancy = handleAsync(async (req, res) => {
+    try {
     const institution = req.params.institution
     const params = req.query
     const id = new mongoose.Types.ObjectId(institution)
-    const initialArray = await Institution.findOne({_id: id}).select().lean();
+    let initialArray = await Institution.findOne({_id: id}).select().lean();
 
     if(req.query.edit  && params.latitude !== "" && params.latitude
     && params.name !== "" && params.name && params.address !== "" && params.address
@@ -156,20 +174,27 @@ const editConsultancy = handleAsync(async (req, res) => {
             const updateInstitution = await Institution.findOneAndUpdate(findValue, updatedValues,{
                 new: true, 
             })
-            return res.json(updateInstitution)
+            const up = true;
+            initialArray = updateInstitution
+            return res.json({initialArray, up})
         }
         else{
-            return res.json(initialArray)
+            const down = true
+            return res.json({initialArray, down})
         }
     }
-    return res.json(initialArray)
+    return res.json({initialArray})
+} catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+}
 })
 
 const editSchool = handleAsync(async (req, res) => {
+    try{
     const institution = req.params.institution
     const params = req.query
     const id = new mongoose.Types.ObjectId(institution)
-    const initialArray = await School.findOne({_id: id}).select().lean();
+    let initialArray = await School.findOne({_id: id}).select().lean();
 
     if(req.query.edit && params.latitude !== "" && params.latitude
     && params.name !== "" && params.name && params.address !== "" && params.address
@@ -198,14 +223,20 @@ const editSchool = handleAsync(async (req, res) => {
             }
             const updateInstitution = await School.findOneAndUpdate(findValue, updatedValues,{
                 new: true, 
-            })
-            return res.json(updateInstitution)
+            })            
+            const up = true;
+            initialArray = updateInstitution
+            return res.json({initialArray, up})
         }
         else{
-            return res.json(initialArray)
+            const down = true
+            return res.json({initialArray, down})
         }
     }
-    return res.json(initialArray)
+    return res.json({initialArray})
+} catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+}
 })
 
 const getAdminShowCase = handleAsync(async (req, res) => {
@@ -225,6 +256,14 @@ const getAdminShowCase = handleAsync(async (req, res) => {
     const totalPage =  Math.ceil( maxValue / 20);
 
     return res.json({structuredInstitution, structuredCollege, structuredSchool, totalPage})
+})
+
+const upload = handleAsync(async(req, res) => {
+    const image = req.file
+    const name = `${req.body.name.replace(/ /g, "_")}.jpg`;
+    const uploadDirectory = 'C:/Users/nency/OneDrive/Desktop/Recomendation_Comparison_System/Educational_Institute/public/images';
+    const filePath = path.join(uploadDirectory, name);
+    fs.rename(image.path, filePath);
 })
 
 const createCollege = handleAsync(async (req, res) => {
@@ -256,9 +295,11 @@ const createCollege = handleAsync(async (req, res) => {
                 ownership: params.ownership === "Private" ? " private Institution " : " community Institution ",
                 established: params.established
             })
+
+            return res.json("Created")
         }
         else{
-            res.status(409).json({ error: 'Already Exists' });
+            return res.json("Exists")
         }
         
     }
@@ -269,8 +310,7 @@ const createCollege = handleAsync(async (req, res) => {
 
 const createSchool = handleAsync(async (req, res) => {
 
-    const params = req.query;
-    
+    const params = req.query;    
     if(params.address !== "" && params.address && params.name !== "" && params.name
     && params.email !== "" && params.email  && params.latitude !== "" && params.latitude
     && params.longitude !== "" && params.longitude  && params.phone !== "" && params.phone
@@ -296,9 +336,10 @@ const createSchool = handleAsync(async (req, res) => {
                 established: params.established
     
             })
+            return res.json("Created")
         }
         else{
-            res.status(409).json({ error: 'Already Exists' });
+            return res.json("Exists")
         }
     }
     else{
@@ -350,9 +391,11 @@ const createConsultancy = handleAsync(async (req, res) => {
                 holidays: holidaySet,
                 online: params.online === "Online" ? true : false
             })
+
+            return res.json("Created")
         }
         else{
-            res.status(409).json({ error: 'Already Exists' });
+            return res.json("Exists")
         }
     }
     else{
@@ -363,4 +406,4 @@ const createConsultancy = handleAsync(async (req, res) => {
 export default { createCollege, 
     createSchool, createConsultancy, getAdminShowCase,
     deleteInstitution, editCollege, editConsultancy, 
-    editSchool, getUserList, editPost, inactivateUser };
+    editSchool, getUserList, editPost, inactivateUser, formatCapital, upload };

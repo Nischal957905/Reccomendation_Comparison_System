@@ -22,7 +22,7 @@ export default function GoogleMap({lat,long}){
                     longitude: long,
                     zoom: 14
                 }}
-                style={{width: 600, height: 400}}
+                style={{width: 400, height: 220, border: 'solid 1px slategray', borderRadius: '10px'}}
                 mapStyle="mapbox://styles/nischal21/cllhdzjk9016x01pb1lj8ao4f"
             >
                 <Marker latitude={lat} longitude={long}>

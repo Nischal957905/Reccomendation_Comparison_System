@@ -9,10 +9,23 @@ import Paper from '@mui/material/Paper';
 
 export default function PostsTable({props}) {
 
+    const dateFormat = (date) =>{
+        const tos = date
+        if(date){
+            const val = tos.substr(0, 10).split("-");
+            return val[2] + "/" + val[1] + "/" + val[0];
+        }
+    }
+
     return (
         <TableContainer component={Paper}>
             <Table sx={{ minWidth: 400 }} size="small" aria-label="a dense table">
                 <TableHead>
+                    <TableRow>
+                        <TableCell></TableCell>
+                        <TableCell>User posts</TableCell>
+                        <TableCell></TableCell>
+                    </TableRow>
                     <TableRow>
                         <TableCell>S.N.</TableCell>
                         <TableCell>Post</TableCell>
@@ -22,6 +35,7 @@ export default function PostsTable({props}) {
                 <TableBody>
                     {
                         props.map((item,index) => {
+                            const date = dateFormat(item.date)
                             return (
                                 <TableRow
                                     key={item._id}
@@ -29,7 +43,7 @@ export default function PostsTable({props}) {
                                 >   
                                     <TableCell>{index + 1}</TableCell>  
                                     <TableCell>{item.post}</TableCell>  
-                                    <TableCell>{item.date}</TableCell>
+                                    <TableCell>{date}</TableCell>
                                 </TableRow>
                             )
                         })

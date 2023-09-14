@@ -1,5 +1,6 @@
 import { Dialog, Button, AppBar, Select, MenuItem} from "@mui/material";
 import React, { useState } from "react";
+import {TextField} from "@mui/material";
 
 export default function SchoolPop(props) {
 
@@ -22,7 +23,7 @@ export default function SchoolPop(props) {
     }
 
     return (
-        <div>
+        <div className="filter-access">
         <Dialog 
             onClose={popUpMenuCloseHandle} 
             open={openStatus} 
@@ -31,21 +32,27 @@ export default function SchoolPop(props) {
             <div className="main-pop-con">
                 <div className="pop-menu-items">
                     <div className="pop-menu-openeing-time">
-                        <label>Opening Time:</label>
-                        <input 
+                        <TextField 
                             type="time" 
                             name="opening-time"
                             value={popUpMenuOptions['opening-time']}
                             onChange={setUpdatedValues}
+                            label="Opening Time"
+                            size="small"
+                            variant="standard"
+                            fullWidth
                         />
                     </div>
                     <div className="pop-menu-closing-time">
-                        <label>Closing Time:</label>
-                        <input 
+                        <TextField 
                             type="time" 
                             name="closing-time"
                             value={popUpMenuOptions['closing-time']}
                             onChange={setUpdatedValues}
+                            label="Closing Time"
+                            size="small"
+                            variant="standard"
+                            fullWidth
                         />
                     </div>
                     <div className="pop-menu-distance">
@@ -62,17 +69,21 @@ export default function SchoolPop(props) {
                         </select>
                     </div>
                     <div className="pop-menu-range-exp">
-                        <label>Experience:</label>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['experience-start']} 
-                            name="experience-start"
-                            onChange={setUpdatedValues}/>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['experience-end']} 
-                            name="experience-end"
-                            onChange={setUpdatedValues}/>
+                        <div className="expp">
+                            <label>Experience:</label>
+                        </div>
+                        <div className="nump">
+                            <input 
+                                type="number" 
+                                value={popUpMenuOptions['experience-start']} 
+                                name="experience-start"
+                                onChange={setUpdatedValues}/>
+                            <input 
+                                type="number" 
+                                value={popUpMenuOptions['experience-end']} 
+                                name="experience-end"
+                                onChange={setUpdatedValues}/>
+                            </div>
                     </div>
                 </div>
                 <div className="pop-menu-div">

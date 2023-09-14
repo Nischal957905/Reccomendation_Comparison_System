@@ -1,4 +1,4 @@
-import { Dialog, Button, AppBar, Select, MenuItem} from "@mui/material";
+import { Dialog, Button, AppBar, Select, MenuItem, TextField} from "@mui/material";
 import React, { useState } from "react";
 
 export default function PopUp(props) {
@@ -30,25 +30,31 @@ export default function PopUp(props) {
             <div className="main-pop-con">
                 <div className="pop-menu-items">
                     <div className="pop-menu-openeing-time">
-                        <label>Opening Time:</label>
-                        <input 
+                        <TextField 
                             type="time" 
                             name="opening-time"
                             value={popUpMenuOptions['opening-time']}
                             onChange={setUpdatedValues}
+                            label="Opening time"
+                            fullWidth
+                            size="small"
                         />
                     </div>
                     <div className="pop-menu-closing-time">
-                        <label>Closing Time:</label>
-                        <input 
+                        <TextField 
                             type="time" 
                             name="closing-time"
                             value={popUpMenuOptions['closing-time']}
                             onChange={setUpdatedValues}
+                            label="Closing time"
+                            fullWidth
+                            size="small"
                         />
                     </div>
-                    <div className="pop-menu-online">
-                        <label>Online:</label>
+                    <div className="rating-pop-up-menu">
+                        <div>
+                            <label>Online:</label>
+                        </div>
                         <select 
                             name="online-service" 
                             className="pop-menu-online-service"
@@ -61,13 +67,15 @@ export default function PopUp(props) {
                         </select>
                     </div>
                     <div className="pop-menu-opening-days">
-                        <label>Opening Days:</label>
+                        <label className="dasd">Opening Days:</label>
                         <Select 
                             multiple 
                             value={popUpMenuOptions['opening-days']} 
                             name="opening-days" onChange={setUpdatedValues} 
                             className="pop-menu-days-options"
-                            style={{fontSize: '12px'}}
+                            style={{fontSize: '12px', padding: '10px'}}
+                            size="small"
+                            fullWidth
                         >
                             <MenuItem value="none" style={{fontSize: '12px'}}>--None--</MenuItem>
                             <MenuItem value="Sunday" style={{fontSize: '12px'}}>Sunday</MenuItem>
@@ -79,8 +87,10 @@ export default function PopUp(props) {
                             <MenuItem value="Saturday" style={{fontSize: '12px'}}>Saturday</MenuItem>
                         </Select>
                     </div>
-                    <div className="pop-menu-platform">
-                        <label>Platform:</label>
+                    <div className="rating-pop-up-menu">
+                        <div>
+                            <label>Platform:</label>
+                        </div>
                         <select 
                             name="platform"
                             className="pop-menu-platform"
@@ -91,8 +101,10 @@ export default function PopUp(props) {
                             <option value="Local">Local</option>
                         </select>
                     </div>
-                    <div className="pop-menu-distance">
-                        <label>Distance:</label>
+                    <div className="rating-pop-up-menu">
+                        <div>
+                            <label>Distance:</label>
+                        </div>
                         <select 
                             name="distance"
                             className="pop-menu-distance"
@@ -105,46 +117,72 @@ export default function PopUp(props) {
                         </select>
                     </div>
                     <div className="pop-menu-range-success">
-                        <label>Success:</label>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['success-start']} 
-                            name="success-start"
-                            onChange={setUpdatedValues}/>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['success-end']} 
-                            name="success-end"
-                            onChange={setUpdatedValues}/>
+                        <div className="expp">
+                            <label>Success:</label>
+                        </div>
+                        <div className="nump">
+                            <div>
+                                <input 
+                                type="number" 
+                                value={popUpMenuOptions['success-start']} 
+                                name="success-start"
+                                onChange={setUpdatedValues}/>
+                            </div>
+                            <div>
+                                <input 
+                                type="number" 
+                                value={popUpMenuOptions['success-end']} 
+                                name="success-end"
+                                onChange={setUpdatedValues}/>
+                            </div>
+                        </div>                        
                     </div>
                     <div className="pop-menu-range-exp">
-                        <label>Experience:</label>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['experience-start']} 
-                            name="experience-start"
-                            onChange={setUpdatedValues}/>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['experience-end']} 
-                            name="experience-end"
-                            onChange={setUpdatedValues}/>
+                        <div className="expp">
+                            <label>Experience:</label>
+                        </div>
+                        <div className="nump">
+                            <div>
+                                <input 
+                                    type="number" 
+                                    value={popUpMenuOptions['experience-start']} 
+                                    name="experience-start"
+                                    onChange={setUpdatedValues}/>
+                            </div>
+                            <div>
+                                <input 
+                                type="number" 
+                                value={popUpMenuOptions['experience-end']} 
+                                name="experience-end"
+                                onChange={setUpdatedValues}/>
+                            </div>
+                        </div>
                     </div>
                     <div className="pop-menu-range-uni">
-                        <label>University:</label>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['university-start']} 
-                            name="university-start"
-                            onChange={setUpdatedValues}/>
-                        <input 
-                            type="number" 
-                            value={popUpMenuOptions['university-end']} 
-                            name="university-end" 
-                            onChange={setUpdatedValues}/>
+                        <div className="expp">
+                            <label>University:</label>
+                        </div>
+                        <div className="nump">
+                            <div>
+                                <input 
+                                type="number" 
+                                value={popUpMenuOptions['university-start']} 
+                                name="university-start"
+                                onChange={setUpdatedValues}/>
+                            </div>
+                            <div>
+                                <input 
+                                    type="number" 
+                                    value={popUpMenuOptions['university-end']} 
+                                    name="university-end" 
+                                    onChange={setUpdatedValues}/>
+                            </div>
+                        </div>
                     </div>
                     <div className="rating-pop-up-menu">
-                        <label>Rating:</label>
+                        <div>
+                            <label>Rating:</label>
+                        </div>
                         <select 
                             name="rating"
                             className="pop-menu-rating"

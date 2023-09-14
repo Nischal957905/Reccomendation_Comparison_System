@@ -5,6 +5,7 @@ Various inclusion of imports containing react-icon imoprts as well as differet s
 
 import { useGetCollegesQuery, useGetCollegesOnAdditionalFilterQuery } from "../../app/api/appSlice"
 import { appSlice } from "../../app/api/appSlice"
+import LinearProgress from '@mui/material/LinearProgress';
 import React, { useEffect, useState } from "react"
 import '../../index.css'
 import Button from '@mui/material/Button'
@@ -169,14 +170,15 @@ export default function CollegeList(){
     
     const collegeName = Array.isArray(colleges)
         ? displayedData.map((college, index) => {
-            const imagesDirectory = `/images/VITO_Education`;
+            const imagesDirectory = `/images/${college.name.replace(/ /g, "_")}`;
+            const name = college.name.length > 25 ? college.name.substring(0,25) + '...' : college.name
             return (
                 <div key={index} className="child-items">
                     <div key={index} className="img-holder">
                         <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
                     </div>
                     <div className="name-holder">
-                        {college.name}
+                        {name}
                         <Link to={`/college/${college.name}`}>
                             <GrFormNextLink className="link-institution"/>
                         </Link>
@@ -252,7 +254,12 @@ export default function CollegeList(){
         </div>
     )
 
-    return(
+    return (
+        <div>
+            {
+                isLoading &&
+                <LinearProgress />
+            }
         <div className="layout">
             <div className="left-div">
                 {   isSuccess &&
@@ -309,12 +316,15 @@ export default function CollegeList(){
                 <div className="top-rated">
                     { rankingCollege}
                 </div>
-                <Paginate
-                    count={totalPages}
-                    update={handlePageChange}
-                    pageCurrently={currentPage}
-                />
+                <div className="pagination-style">
+                    <Paginate
+                        count={totalPages}
+                        update={handlePageChange}
+                        pageCurrently={currentPage}
+                    />
+                </div>
             </div>
+        </div>
         </div>
     )
 }

@@ -16,7 +16,7 @@ export default function Login(){
     })
 
     const [delayedValue, setDelayedValue] = useState()
-    const [dataError, setDataError] = useState()
+    const [dataError, setDataError] = useState(false)
 
     const {
         data,
@@ -25,27 +25,36 @@ export default function Login(){
         isError,
         error
     } = usePostLoginQuery(delayedValue)
+    console.log(data)
 
     useEffect(() => {
         if (isSuccess) {
-            const token = data?.tokenForAccess;
-            const userVerify = data?.userVerify;
-            const username = data?.user?.username;
-            const roles = data?.roles?.role_name;
-            if(data.userVerify){
-                localStorage.clear()
-                localStorage.setItem('username', username);
-                localStorage.setItem('login',true)
-                localStorage.setItem('role', roles)
-                setValueForAuth({'username': username,'login':true,})
-                setFormData({
-                    username: '',
-                    password: '',
-                })
-                navigate(from, {replace: true})
+            if(data === "No user found"){
+                setDataError(true)
+            }
+            else{
+                setDataError(false)
+                const token = data?.tokenForAccess;
+                const userVerify = data?.userVerify;
+                const username = data?.user?.username;
+                const roles = data?.roles?.role_name;
+                if(data.userVerify){
+                    localStorage.clear()
+                    localStorage.setItem('username', username);
+                    localStorage.setItem('login',true)
+                    localStorage.setItem('role', roles)
+                    setValueForAuth({'username': username,'login':true,})
+                    setFormData({
+                        username: '',
+                        password: '',
+                    })
+                    navigate(from, {replace: true})
+                }
             }
         }
     }, [data]);
+
+    console.log(data && data)
 
     const handleSubmit = (event) => {
         event.preventDefault()
@@ -55,6 +64,7 @@ export default function Login(){
     const handleLoginValueChange = (event) => {
         const {value, name} = event.target;
         setFormData(prevVal => {
+            setDataError(false)
             return {
                 ...prevVal,
                 [name]: value,
@@ -64,27 +74,48 @@ export default function Login(){
     
     return (
         <div>
-            <form onSubmit= {handleSubmit} >
+            <div className="logost">
+                <img src='/logo.png'></img>
+            </div>
+            <div className="form-parent">
+                <form onSubmit= {handleSubmit} >
+                    <div className="header-pp">
+                    🆂🅸🅶🅽 🅸🅽 🆃🅾 🅲🅾🅽🆂🆄🅻🆃🅼🅴
+                    </div>
                     <div className="login-username">
-                        <label>Username:</label>
                         <input 
                             type="text" 
                             name="username"
                             value={formData.username}
+                            placeholder="Username"
                             onChange={handleLoginValueChange}
+                            required
                         />
                     </div>
                     <div className="login-password">
-                        <label>Password</label>
                         <input 
                             type="password" 
                             name="password"
                             value={formData.password}
+                            placeholder="Password"
                             onChange={handleLoginValueChange}
+                            required
                         />
                     </div>
-                <button>Login</button>
-            </form>
+                    {
+                        dataError && 
+                        <div className="login-error">
+                            <p>Wrong Credentials</p>
+                        </div>
+                    }
+                    <div className="format-btn">
+                        <button type="submit">Log in</button>
+                    </div>
+                    <div className="format-signup">
+                        No account?<p><a href="/auth/register">Create acc</a></p>
+                    </div>
+                </form>
+            </div>
         </div>
     )
 }

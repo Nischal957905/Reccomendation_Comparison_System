@@ -26,7 +26,11 @@ export default function TableProp({institutionList, link, deletion, category, ed
                         </TableCell>
                         <TableCell></TableCell>
                         <TableCell></TableCell>
-                        <TableCell></TableCell>
+                        <TableCell>
+                            <Link to="/admin/user">
+                                <Button>Users</Button>
+                            </Link>
+                        </TableCell>
                     </TableRow>
                     <TableRow>
                         <TableCell>Delete</TableCell>

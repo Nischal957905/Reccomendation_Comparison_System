@@ -4,6 +4,7 @@ Various inclusion of imports containing react-icon imoprts as well as differet s
 */
 
 import { useGetSchoolsQuery } from "../../app/api/appSlice"
+import LinearProgress from '@mui/material/LinearProgress';
 import { appSlice } from "../../app/api/appSlice"
 import React, { useEffect, useState } from "react"
 import '../../index.css'
@@ -171,14 +172,15 @@ export default function SchoolList(){
     
     const collegeName = Array.isArray(colleges)
         ? displayedData.map((college, index) => {
-            const imagesDirectory = `/images/BrihaspatiVidyasadan`;
+            const imagesDirectory = `/images/${college.name.replace(/ /g, "_")}`;
+            const name = college.name.length > 15 ? college.name.substring(0,25) + '...' : college.name
             return (
                 <div key={index} className="child-items">
                     <div key={index} className="img-holder">
                         <img src={`${imagesDirectory}.jpg`} className="logo-img"></img>
                     </div>
                     <div className="name-holder">
-                        {college.name}
+                        {name}
                         <Link to={`/school/${college.name}`}>
                             <GrFormNextLink className="link-institution"/>
                         </Link>
@@ -254,7 +256,12 @@ export default function SchoolList(){
         </div>
     )
 
-    return(
+    return (
+        <div>
+            {
+                isLoading &&
+                <LinearProgress />
+            }
         <div className="layout">
             <div className="left-div">
                 {   isSuccess &&
@@ -311,12 +318,15 @@ export default function SchoolList(){
                 <div className="top-rated">
                     { rankingCollege}
                 </div>
-                <Paginate
-                    count={totalPages}
-                    update={handlePageChange}
-                    pageCurrently={currentPage}
-                />
+                <div className="pagination-style">
+                    <Paginate
+                        count={totalPages}
+                        update={handlePageChange}
+                        pageCurrently={currentPage}
+                    />
+                </div>
             </div>
+        </div>
         </div>
     )
 }
